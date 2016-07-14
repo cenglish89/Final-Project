@@ -167,9 +167,12 @@ Chart.prototype = {
       .transition().delay(TRANSITION_DURATION / 2)
       .text(app.options.year);
 
+      //return d.country is a key, look for circle with that label year after year
+      //data function takes data then the key
     var countries = chart.svg.selectAll('.country')
-      .data(txData);
+      .data(txData, function (d) { return d.country; });
 
+      // new data
     countries.enter().append('circle')
       .attr('class', 'country')
       .style('fill', function (d) { return chart.color(d.continent); })
@@ -178,6 +181,8 @@ Chart.prototype = {
       .attr('cx', chart.width / 2)
       .attr('cy', chart.height / 2)
 
+      //deals with all the circles, previously existing and new
+      //small circles are in front
     countries
       .sort(function (a, b) { return b.population - a.population; })
       .transition().duration(TRANSITION_DURATION)
@@ -185,6 +190,7 @@ Chart.prototype = {
       .attr('cx', function (d) { return chart.x(d.total_fertility); })
       .attr('cy', function (d) { return chart.y(d.life_expectancy); });
 
+      //for the circles that exit, do animation as remove
     countries.exit()
       .transition().duration(TRANSITION_DURATION)
       .attr('r', 0)
