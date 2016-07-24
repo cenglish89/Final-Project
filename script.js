@@ -39,6 +39,7 @@ app = {
     // app.resize() will be called anytime the page size is changed
     d3.select('window').on('resize', app.resize);
 
+    app.update();
 
   },
 
@@ -46,6 +47,9 @@ app = {
     app.components.forEach(function (c) { if (c.resize) { c.resize(); }});
   },
 
+  update: function () {
+    app.components.forEach(function (c) { if (c.update) { c.update(); }});
+  }
 }
 
 function Chart(selector) {
@@ -99,7 +103,7 @@ function Chart(selector) {
   chart.svg.append("g")
     .attr("class", "x axis")
     .attr('transform', 'translate(0,' + chart.height + ')')
-    .call(xAxis)
+    .call(xAxis);
     
   chart.svg.append('text')
     .attr('x', chart.width/2)
@@ -117,7 +121,7 @@ function Chart(selector) {
 
   chart.svg.append("g")
     .attr("class", "y axis")
-    .call(yAxis)
+    .call(yAxis);
     
   chart.svg.append("text")
     .attr("transform", "rotate(-90)")
