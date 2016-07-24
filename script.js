@@ -18,7 +18,7 @@ app = {
   components: [],
 
   options: {
-    year: 'all'
+    socgroup: 'all'
   },
 
   initialize: function (data) {
@@ -31,10 +31,10 @@ app = {
 
 
     // Add event listeners and the like here
-  //  d3.select('#soc-group').on('change', function () {
-  //    app.options.socgroup = d3.event.target.value;
-  //    charts.forEach(function (d) {d.update(); }); 
-  //  });
+    d3.select('#soc-group').on('change', function () {
+      app.options.socgroup = d3.event.target.value;
+      charts.forEach(function (d) {d.update(); }); 
+    });
 
 
     // app.resize() will be called anytime the page size is changed
@@ -54,7 +54,7 @@ function Chart(selector) {
 
   // SVG and MARGINS
   var margin = { 
-    top: 15, right: 85, bottom: 30, left: 55
+    top: 20, right: 85, bottom: 30, left: 55
   };
 
   chart.width = 640 - margin.right - margin.left;
@@ -101,14 +101,13 @@ function Chart(selector) {
     .attr("class", "x axis")
     .attr('transform', 'translate(0,' + chart.height + ')')
     .call(xAxis)
-    .append('text')
+    
+  chart.svg.append('text')
     .attr('x', chart.width/2)
     .attr('y', chart.height+margin.top)
     .attr('dy', ".71em")
     .style('text-anchor', "middle")
-    .style('fill', '#000')
-    .style('font-weight', 'bold')
-    .text("Percent of Workers that are Women");
+    .text('Percent of Workers that are Women');
 
 
   var formatAsDollars = d3.format("$.0f")
@@ -120,10 +119,11 @@ function Chart(selector) {
   chart.svg.append("g")
     .attr("class", "y axis")
     .call(yAxis)
-    .append("text")
+    
+  chart.svg.append("text")
     .attr("transform", "rotate(-90)")
     .attr("x", -1*(chart.height/2))
-    .attr("y", -1*(chart.width/11))
+    .attr("y", -1*(chart.width/9))
     .attr("dy", ".71em")
     .style("text-anchor", "middle")
     .text("Median Weekly Earnings");
@@ -153,14 +153,16 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
-    txData = app.data.slice();
+    txData = app.data;
 
-//    if (app.options.socgroup !== 'all') {
-//      var socgroup=app.options.socgroup;
-//      txData = txData.filter(function (d) {
-//        return d.groupname === socgroup;
-//      });
-//    }
+    console.log(app.options.socgroup)
+
+    if (app.options.socgroup !== 'all') {
+      var socgroup=app.options.socgroup;
+      txData = txData.filter(function (d) {
+        return d.grp_text === socgroup;
+      });
+    }
 
     var t = d3.transition().duration(TRANSITION_DURATION)
 
@@ -176,10 +178,10 @@ Chart.prototype = {
     points.enter().append('circle')
       .attr('class','point')
       .attr('r', 0)
-      .transition().duration(TRANSITION_DURATION)
-      .attr('r', function (d) { return chart.r(d.total); })
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
+      .transition().duration(TRANSITION_DURATION)
+      .attr('r', function (d) { return chart.r(d.total); })
       .merge(points)
       .sort(function (a, b) { return b.total - a.total; })
       
