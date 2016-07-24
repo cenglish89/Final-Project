@@ -3,7 +3,7 @@
 }
 
 .header {
-  background: linear-gradient(to bottom, #337ab7 0%, #135a97 100%);
+  background: #216C2A;
   color: white;
   padding: 1em 0 2em;
 }
@@ -11,4 +11,48 @@
 #chart svg {
   display: block;
   margin: 0 auto;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
+.axis .minor line {
+  stroke: #ccc;
+  stroke-dasharray: 2,2;
+}
+
+.axis text {
+  font-size: 11px;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.point {
+  stroke: rgb(51, 122, 183);
+  stroke-width: 1;
+  fill: rgba(51, 122, 183, .5);
+  opacity: .5;
+}
+
+.point.filtered {
+  opacity: .05;
+}
+
+.line {
+  stroke: rgb(175, 80, 75);
+  stroke-width: 2;
+}
+
+.tooltip {
+  padding: .5em 1em;
+  background: rgba(0,0,0,.75);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
 }

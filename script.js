@@ -1,41 +1,24 @@
 var app;
 
-// Declaring our constants
-var START_YEAR = 1950;
-var END_YEAR = 2015;
-var MAX_RADIUS = 50;
+var MAX_RADIUS=25;
 var TRANSITION_DURATION = 750;
+var binCount = 10;
 
-//single file
-//d3.json('data/data.json', function (error, data) {
-//  if (error) { throw error; }
-//  app.initialize(data);
-//});
-
-// d3.queue()
- //  .defer(d3.json, 'data/data.json')
-//   .defer(d3.csv, 'data/table.csv')
-//   .awaitAll(function (error, results) {
-//     if (error) { throw error; }
-//     app.initialize(results[0], results[1]);
-//   });
-
-// // d3.queue() enables us to load multiple data files. Following the example below, we make
-// // additional .defer() calls with additional data files, and they are returned as results[1],
-// // results[2], etc., once they have all finished downloading.
- d3.queue()
-   .defer(d3.json, 'data/data.json')
-   .awaitAll(function (error, results) {
-     if (error) { throw error; }
-     app.initialize(results[0]);
-   });
+  //.defer(d3.json, 'data/cip_data.json')
+  
+d3.queue()
+  .defer(d3.json, 'data/soc_data.json')
+  .awaitAll(function (error, results) {
+    if (error) { throw error; }
+    app.initialize(results[0]);
+  });
 
 app = {
   data: [],
   components: [],
 
   options: {
-    year: START_YEAR
+    year: 'all'
   },
 
   initialize: function (data) {
@@ -43,48 +26,40 @@ app = {
 
     // Here we create each of the components on our page, storing them in an array
     app.components = [
-      new Chart('#chart')
+      new Chart('#chart','app.data.femper','app.data.earn')
     ];
 
+
     // Add event listeners and the like here
+   // d3.select('#soc-group').on('change', function () {
+   //   app.options.socgroup = d3.event.target.value;
+   //   charts.forEach(function (d) {d.update(); }); 
+   // });
+
 
     // app.resize() will be called anytime the page size is changed
     d3.select('window').on('resize', app.resize);
 
-    // For demo purposes, let's tick the year every 750ms
-    function incrementYear() {
-      app.options.year += 1;
-      if (app.options.year > END_YEAR) {
-        app.options.year = START_YEAR;
-      }
 
-      app.update();
-    }
-
-    //setInterval(incrementYear, TRANSITION_DURATION) <= old version;
-    d3.interval(incrementYear, TRANSITION_DURATION);
   },
 
   resize: function () {
     app.components.forEach(function (c) { if (c.resize) { c.resize(); }});
   },
 
-  update: function () {
-    app.components.forEach(function (c) { if (c.update) { c.update(); }});
-  }
 }
 
-function Chart(selector) {
+function Chart(selector,columnX,columnY) {
   var chart = this;
 
   // SVG and MARGINS
-
-  var margin = {
-    top: 15, right: 15, bottom: 40, left: 45
+  var margin = { 
+    top: 15, right: 85, bottom: 30, left: 55
   };
 
-  chart.width = 600 - margin.left - margin.right;
+  chart.width = 640 - margin.right - margin.left;
   chart.height = 400 - margin.top - margin.bottom;
+
 
   chart.svg = d3.select(selector)
     .append('svg')
@@ -97,68 +72,82 @@ function Chart(selector) {
 
   //now in d3 4version
   chart.x = d3.scaleLinear()
-    .domain([0, d3.max(app.data, function (d) { return d.total_fertility; })])
-    .range([0, chart.width])
-    .nice();
+      .domain([0, d3.max(app.data, function (d) {return d[chart.columnX];})])
+      .range([0, chart.width])
+      .nice();
+
+console.log(chart.x(.43))
 
   chart.y = d3.scaleLinear()
-    .domain([0, d3.max(app.data, function (d) { return d.life_expectancy; })])
+    .domain([0, d3.max(app.data, function (d) { return d[chart.columnY]; })])
     .range([chart.height, 0])
     .nice();
 
+console.log(chart.y(870))
+
   chart.r = d3.scaleSqrt()
-    .domain([0, d3.max(app.data, function (d) { return d.population; })])
+    .domain([0, d3.max(app.data, function (d) { return d.total; })])
     .range([0, MAX_RADIUS]);
 
     //d3 4version
     //can now take color brewer
-  chart.color = d3.scaleOrdinal(d3.schemeCategory10);
+  chart.color = d3.scaleOrdinal(d3.schemeCategory22);
 
   // AXES
     //no more .svg, no more .orient
+  var formatAsPercentage = d3.format(".0%");
+
   var xAxis = d3.axisBottom()
-    .scale(chart.x);
+                .scale(chart.x)
+                .tickFormat(formatAsPercentage);
 
-  var yAxis = d3.axisLeft()
-    .scale(chart.y);
-
-  chart.svg.append('g')
-    .attr('class', 'x axis')
+  chart.svg.append("g")
+    .attr("class", "x axis")
     .attr('transform', 'translate(0,' + chart.height + ')')
     .call(xAxis)
     .append('text')
-    .attr('y', 30)
-    .attr('x', chart.width)
-    .style('text-anchor', 'end')
+    .attr('x', chart.width/2)
+    .attr('y', chart.height+margin.top)
+    .attr('dy', ".71em")
+    .style('text-anchor', "middle")
     .style('fill', '#000')
     .style('font-weight', 'bold')
-    .text('Fertility (births per woman)');
+    .text("Percent of Workers that are Women");
 
-  chart.svg.append('g')
-    .attr('class', 'y axis')
+
+  var formatAsDollars = d3.format("$.0f")
+
+  var yAxis = d3.axisLeft()
+                    .scale(chart.y)
+                    .tickFormat(formatAsDollars);
+
+  chart.svg.append("g")
+    .attr("class", "y axis")
     .call(yAxis)
-    .append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('dy', '.71em')
-    .attr('y', -35)
-    .attr('x', 0)
-    .style('text-anchor', 'end')
-    .style('fill', '#000')
-    .style('font-weight', 'bold')
-    .text('Life expectancy (years)');
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -1*(chart.height/2))
+    .attr("y", -1*(chart.width/11))
+    .attr("dy", ".71em")
+    .style("text-anchor", "middle")
+    .text("Median Weekly Earnings");
 
-  // YEAR LABEL
 
-  chart.svg.append('text')
-    .attr('class', 'year')
-    .attr('x', chart.width / 2)
-    .attr('y', chart.height / 2)
-    .attr('dy', '.35em')
-    .style('text-anchor', 'middle')
-    .style('font-size', '230px')
-    .style('font-weight', 'bold')
-    .style('opacity', 0.2)
-    .text(app.options.year);
+ chart.svg.append("g")
+    .append("text")
+    .attr("x", chart.width+5)
+    .attr("y", chart.y(870))
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("Total Median");
+
+ chart.svg.append("g")
+    .append("text")
+    .attr("x", chart.width+5)
+    .attr("y", chart.y(770))
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("Earnings"); 
 
   chart.update();
 }
@@ -168,42 +157,49 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
+    txData = app.data.slice();
 
-    var txData = app.data.filter(function (d) { return d.year === app.options.year; });
+//    if (app.options.socgroup !== 'all') {
+//      var socgroup=app.options.socgroup;
+//      txData = txData.filter(function (d) {
+//        return d.groupname === socgroup;
+//      });
+//    }
 
     var t = d3.transition().duration(TRANSITION_DURATION)
 
     // UPDATE CHART ELEMENTS
 
-    var yearText = d3.selectAll('.year')
-      .transition().delay(TRANSITION_DURATION / 2)
-      .text(app.options.year);
-
       //return d.country is a key, look for circle with that label year after year
       //data function takes data then the key
-    var countries = chart.svg.selectAll('.country')
-      .data(txData, function (d) { return d.country; });
+    var points=chart.svg.selectAll('.point')
+      .data(txData, function (d) { return d.socname; });
 
       //.merge and after is created and previously existing circles
       //before .merge only applies to the new selections
-    countries.enter().append('circle')
-      .attr('class', 'country')
-      .style('fill', function (d) { return chart.color(d.continent); })
-      .style('opacity', 0.75)
+    points.enter().append('circle')
+      .attr('class','point')
       .attr('r', 0)
-      .attr('cx', chart.width / 2)
-      .attr('cy', chart.height / 2)
-      .merge(countries)
-      .sort(function (a, b) { return b.population - a.population; })
-      .transition(t)
-      .attr('r', function (d) { return chart.r(d.population); })
-      .attr('cx', function (d) { return chart.x(d.total_fertility); })
-      .attr('cy', function (d) { return chart.y(d.life_expectancy); });
-
+      .transition().duration(TRANSITION_DURATION)
+      .attr('r', function (d) { return chart.r(d.total); })
+      .attr('cx', function(d) { return chart.x(d[chart.columnX]); })
+      .attr('cy',  function(d) { return chart.y(d[chart.columnY]); })
+      .merge(points)
+      .sort(function (a, b) { return b.total - a.total; })
+      
       //for the circles that exit, do animation as remove
-    countries.exit()
-      .transition(t)
+    points.exit()
+      .transition().duration(TRANSITION_DURATION)
       .attr('r', 0)
       .remove();
+
+    var line = chart.svg.append('line')
+      .attr('x1',0)
+      .attr('y1',chart.y(803))
+      .attr('x2',chart.width)
+      .attr('y2',chart.y(803))
+      .attr('stroke-width',2)
+      .attr('stroke','black');   
+
   }
 }
