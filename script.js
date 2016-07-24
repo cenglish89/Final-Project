@@ -26,15 +26,15 @@ app = {
 
     // Here we create each of the components on our page, storing them in an array
     app.components = [
-      new Chart('#chart','app.data.femper','app.data.earn')
+      new Chart('#chart')
     ];
 
 
     // Add event listeners and the like here
-   // d3.select('#soc-group').on('change', function () {
-   //   app.options.socgroup = d3.event.target.value;
-   //   charts.forEach(function (d) {d.update(); }); 
-   // });
+  //  d3.select('#soc-group').on('change', function () {
+  //    app.options.socgroup = d3.event.target.value;
+  //    charts.forEach(function (d) {d.update(); }); 
+  //  });
 
 
     // app.resize() will be called anytime the page size is changed
@@ -49,7 +49,7 @@ app = {
 
 }
 
-function Chart(selector,columnX,columnY) {
+function Chart(selector) {
   var chart = this;
 
   // SVG and MARGINS
@@ -72,18 +72,14 @@ function Chart(selector,columnX,columnY) {
 
   //now in d3 4version
   chart.x = d3.scaleLinear()
-      .domain([0, d3.max(app.data, function (d) {return d[chart.columnX];})])
+      .domain([0, d3.max(app.data, function (d) {return d.femper;})])
       .range([0, chart.width])
       .nice();
 
-console.log(chart.x(.43))
-
   chart.y = d3.scaleLinear()
-    .domain([0, d3.max(app.data, function (d) { return d[chart.columnY]; })])
+    .domain([0, d3.max(app.data, function (d) { return d.earn; })])
     .range([chart.height, 0])
     .nice();
-
-console.log(chart.y(870))
 
   chart.r = d3.scaleSqrt()
     .domain([0, d3.max(app.data, function (d) { return d.total; })])
@@ -182,8 +178,8 @@ Chart.prototype = {
       .attr('r', 0)
       .transition().duration(TRANSITION_DURATION)
       .attr('r', function (d) { return chart.r(d.total); })
-      .attr('cx', function(d) { return chart.x(d[chart.columnX]); })
-      .attr('cy',  function(d) { return chart.y(d[chart.columnY]); })
+      .attr('cx', function(d) { return chart.x(d.femper); })
+      .attr('cy',  function(d) { return chart.y(d.earn); })
       .merge(points)
       .sort(function (a, b) { return b.total - a.total; })
       
