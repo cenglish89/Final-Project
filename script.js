@@ -5,7 +5,6 @@ var TRANSITION_DURATION = 750;
 var binCount = 10;
 
   //.defer(d3.json, 'data/cip_data.json')
-  
 d3.queue()
   .defer(d3.json, 'data/soc_data.json')
   .awaitAll(function (error, results) {
@@ -87,7 +86,7 @@ function Chart(selector) {
 
     //d3 4version
     //can now take color brewer
-  chart.color = d3.scaleOrdinal(d3.schemeCategory22);
+ // chart.color = d3.scaleOrdinal(d3.schemeCategory22);
 
   // AXES
     //no more .svg, no more .orient
@@ -153,9 +152,7 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
-    txData = app.data;
-
-    console.log(app.options.socgroup)
+    txData = app.data.slice();
 
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
@@ -180,10 +177,10 @@ Chart.prototype = {
       .attr('r', 0)
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
-      .transition().duration(TRANSITION_DURATION)
+      .transition(t)
       .attr('r', function (d) { return chart.r(d.total); })
       .merge(points)
-      .sort(function (a, b) { return b.total - a.total; })
+      .sort(function (a, b) { return b.total - a.total; });
       
       //for the circles that exit, do animation as remove
     points.exit()
