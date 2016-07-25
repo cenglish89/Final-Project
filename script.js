@@ -32,7 +32,7 @@ app = {
     // Add event listeners and the like here
     d3.select('#soc-group').on('change', function () {
       app.options.socgroup = d3.event.target.value;
-      charts.forEach(function (d) {d.update(); }); 
+      app.components.forEach(function (d) {d.update(); }); 
     });
 
 
@@ -182,9 +182,9 @@ Chart.prototype = {
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
       .transition(t)
-      .attr('r', function (d) { return chart.r(d.total); })
-      .merge(points)
-      .sort(function (a, b) { return b.total - a.total; });
+      .attr('r', function (d) { return chart.r(d.total); });
+      //.merge(points)
+      //.sort(function (a, b) { return b.total - a.total; });
       
       //for the circles that exit, do animation as remove
     points.exit()
