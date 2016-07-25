@@ -17,7 +17,8 @@ app = {
   components: [],
 
   options: {
-    socgroup: 'all'
+    socgroup: 'all',
+    filtered: false
   },
 
   initialize: function (data) {
@@ -30,6 +31,31 @@ app = {
 
 
     // Add event listeners and the like here
+
+      d3.select('#filter-agg').on('click', function () {
+        if (app.options.filtered === 'agg') {
+          app.options.filtered = false;
+          d3.select('#filter-agg').classed('active', false);
+        } else {
+          app.options.filtered = 'agg';
+          d3.selectAll('.filter').classed('active', false);
+          d3.select('#filter-agg').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+      d3.select('#filter-detail').on('click', function () {
+        if ( app.options.filtered === 'detail') {
+           app.options.filtered = false;
+          d3.select('#filter-detail').classed('active', false);
+        } else {
+           app.options.filtered = 'detail';
+          d3.selectAll('.filter').classed('active', false);
+          d3.select('#filter-detail').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
     d3.select('#soc-group').on('change', function () {
       app.options.socgroup = d3.event.target.value;
       app.components.forEach(function (d) {d.update(); }); 
@@ -158,12 +184,19 @@ Chart.prototype = {
     // TRANSFORM DATA
     txData = app.data.slice();
 
+    if (app.options.filtered) {
+        txData = txData.filter(function (d) { return d.level === app.options.filtered; });
+    } 
+
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
       txData = txData.filter(function (d) {
         return d.grp_text === socgroup;
       });
     }
+
+    d3.selectAll('#soc-group').classed('disabled', app.options.filtered=='agg');
+
 
     var t = d3.transition().duration(TRANSITION_DURATION)
 

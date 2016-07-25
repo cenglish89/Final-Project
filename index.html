@@ -19,7 +19,13 @@
 <div class="controls section">
   <div class="container">
     <div class="btn-toolbar">
-      <label for="soc-group">Occupational Group: </label>
+      <div class="btn-group">
+      <div class="filter">
+        <button type="button" class="btn btn-default filter" id="filter-agg">Aggregate Occupations</button>
+        <button type="button" class="btn btn-default filter" id="filter-detail">Detailed Occupations</button>
+    </div>
+    <div class="btn-toolbar">
+      <label for="soc-group">Detailed Occupational Group: </label>
       <select id="soc-group">
         <option value="all">All Occupational Groups</option>
         <option value="mgt">Management</option>
