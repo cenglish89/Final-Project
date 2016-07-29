@@ -4,12 +4,13 @@ var MAX_RADIUS=25;
 var TRANSITION_DURATION = 750;
 var binCount = 10;
 
-  //.defer(d3.json, 'data/cip_data.json')
+  //
 d3.queue()
   .defer(d3.json, 'data/soc_data.json')
+  .defer(d3.json, 'data/cip_data.json')
   .awaitAll(function (error, results) {
     if (error) { throw error; }
-    app.initialize(results[0]);
+    app.initialize(results[0],results[1]);
   });
 
 app = {
@@ -26,7 +27,8 @@ app = {
 
     // Here we create each of the components on our page, storing them in an array
     app.components = [
-      new Chart('#chart')
+      new Chart('#chart1')
+      //, new Pie('#chart2')
     ];
 
 
