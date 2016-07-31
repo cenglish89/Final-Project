@@ -118,7 +118,11 @@ function Chart(selector) {
 
     //d3 4version
     //can now take color brewer
- // chart.color = d3.scaleOrdinal(d3.schemeCategory22);
+//  chart.color = d3.scaleLinear()
+//    .domain([d3.min(app.data, function (d) { return d.wagegap_group; }),d3.max(app.data, function (d) { return d.wagegap_group; })])
+//    .range(['#761200','#1C8D46']);
+  //chart.color=['#470B00','#96230D','#B15500','#968A0D','#0A6E2c']
+
 
   // AXES
     //no more .svg, no more .orient
@@ -216,6 +220,32 @@ Chart.prototype = {
       .attr('r', 0)
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
+      .style('stroke',  function (d) {
+        var returnColor;
+        if (d.wagegap_group===1) {
+              returnColor='#0A6E2c';
+            } else if (d.wagegap_group===2) {
+              returnColor='#968A0D';
+            } else if (d.wagegap_group===3) {
+              returnColor='#B15500';
+            } else if (d.wagegap_group===4) {
+              returnColor='#96230D';
+            } else returnColor='#96230D';
+            return returnColor;
+      })
+      .style('fill', function (d) {
+        var returnColor;
+        if (d.wagegap_group===1) {
+              returnColor='#0A6E2c';
+            } else if (d.wagegap_group===2) {
+              returnColor='#968A0D';
+            } else if (d.wagegap_group===3) {
+              returnColor='#B15500';
+            } else if (d.wagegap_group===4) {
+              returnColor='#96230D';
+            } else returnColor='#96230D';
+            return returnColor;
+      })
       .transition(t)
       .attr('r', function (d) { return chart.r(d.total); });
       //.merge(points)
