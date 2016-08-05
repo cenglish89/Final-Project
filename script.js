@@ -1,16 +1,15 @@
 var app;
 
-var MAX_RADIUS=25;
+var MAX_RADIUS=30;
 var TRANSITION_DURATION = 750;
 var binCount = 10;
 
   //
 d3.queue()
   .defer(d3.json, 'data/soc_data.json')
-  .defer(d3.json, 'data/cip_data.json')
   .awaitAll(function (error, results) {
     if (error) { throw error; }
-    app.initialize(results[0],results[1]);
+    app.initialize(results[0]);
   });
 
 app = {
@@ -19,7 +18,8 @@ app = {
 
   options: {
     socgroup: 'all',
-    filtered: false
+    filtered: 'agg',
+    highlight: false,
   },
 
   initialize: function (data) {
@@ -33,11 +33,13 @@ app = {
 
 
     // Add event listeners and the like here
+      d3.select('#filter-agg').classed('active', true);
+      //d3.selectAll('#soc-group').classed('hide', true);
 
       d3.select('#filter-agg').on('click', function () {
         if (app.options.filtered === 'agg') {
           app.options.filtered = false;
-          d3.select('#filter-agg').classed('active', false);
+          d3.select('#filter-agg').classed('active', false);  
         } else {
           app.options.filtered = 'agg';
           d3.selectAll('.filter').classed('active', false);
@@ -63,6 +65,18 @@ app = {
       app.components.forEach(function (d) {d.update(); }); 
     });
 
+    d3.select('#highlight-wTotal').on('click', function () {
+        if (app.options.highlight === 'wTotal') {
+          app.options.highlight = false;
+          d3.select('#highlight-wTotal').classed('active', false);
+        } else {
+          app.options.highlight = 'wTotal';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-wTotal').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
 
     // app.resize() will be called anytime the page size is changed
     d3.select('window').on('resize', app.resize);
@@ -85,11 +99,11 @@ function Chart(selector) {
 
   // SVG and MARGINS
   var margin = { 
-    top: 20, right: 85, bottom: 30, left: 55
+    top: 20, right: 85, bottom: 130, left: 55
   };
 
   chart.width = 640 - margin.right - margin.left;
-  chart.height = 400 - margin.top - margin.bottom;
+  chart.height = 500 - margin.top - margin.bottom;
 
 
   chart.svg = d3.select(selector)
@@ -117,12 +131,9 @@ function Chart(selector) {
     .range([0, MAX_RADIUS]);
 
     //d3 4version
-    //can now take color brewer
-//  chart.color = d3.scaleLinear()
-//    .domain([d3.min(app.data, function (d) { return d.wagegap_group; }),d3.max(app.data, function (d) { return d.wagegap_group; })])
-//    .range(['#761200','#1C8D46']);
-  //chart.color=['#470B00','#96230D','#B15500','#968A0D','#0A6E2c']
-
+  chart.color = d3.scaleThreshold()
+    .domain([1,2,3,4,5])
+    .range(['#eeeeee','#016c59','#fed976','#fd8d3c','#f03b20','#bd0026']);
 
   // AXES
     //no more .svg, no more .orient
@@ -194,6 +205,7 @@ Chart.prototype = {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
+
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
       txData = txData.filter(function (d) {
@@ -201,8 +213,16 @@ Chart.prototype = {
       });
     }
 
-    d3.selectAll('#soc-group').classed('disabled', app.options.filtered=='agg');
-
+    //Hide the options for detailed looks until ready for it
+    if (app.options.filtered === 'agg') {
+      d3.selectAll('#soc-group').classed('hide', true);  
+      d3.selectAll('#detail-filter.filter').classed('hide', true);
+    } else {
+       d3.selectAll('#soc-group').classed('hide', false);
+       d3.selectAll('#detail-filter.filter').classed('hide', false);
+    }
+    
+    //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
     var t = d3.transition().duration(TRANSITION_DURATION)
 
@@ -215,41 +235,20 @@ Chart.prototype = {
 
       //.merge and after is created and previously existing circles
       //before .merge only applies to the new selections
+
+      //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+      //array find to get location of aggregate
     points.enter().append('circle')
       .attr('class','point')
       .attr('r', 0)
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
-      .style('stroke',  function (d) {
-        var returnColor;
-        if (d.wagegap_group===1) {
-              returnColor='#0A6E2c';
-            } else if (d.wagegap_group===2) {
-              returnColor='#968A0D';
-            } else if (d.wagegap_group===3) {
-              returnColor='#B15500';
-            } else if (d.wagegap_group===4) {
-              returnColor='#96230D';
-            } else returnColor='#96230D';
-            return returnColor;
-      })
-      .style('fill', function (d) {
-        var returnColor;
-        if (d.wagegap_group===1) {
-              returnColor='#0A6E2c';
-            } else if (d.wagegap_group===2) {
-              returnColor='#968A0D';
-            } else if (d.wagegap_group===3) {
-              returnColor='#B15500';
-            } else if (d.wagegap_group===4) {
-              returnColor='#96230D';
-            } else returnColor='#96230D';
-            return returnColor;
-      })
+      .style('stroke',  function (d) {return chart.color([d.wagegap_group]) })
+      .style('fill', function (d) { return chart.color([d.wagegap_group]) })
       .transition(t)
       .attr('r', function (d) { return chart.r(d.total); });
       //.merge(points)
-      //.sort(function (a, b) { return b.total - a.total; });
+      //.sort(function (a, b) { return b.population - a.population; });
       
       //for the circles that exit, do animation as remove
     points.exit()

@@ -41,6 +41,11 @@
   opacity: .05;
 }
 
+.point.grey {
+  fill: 'grey';
+  opacity: .5;
+}
+
 .line {
   stroke: rgb(175, 80, 75);
   stroke-width: 2;
