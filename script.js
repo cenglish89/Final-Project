@@ -389,15 +389,29 @@ Chart2.prototype = {
       .delay(function (d,i){ return (i * 50) })
       .duration(2500)
       .attr('r', function (d) { return chart2.r(d.count); });
-
-      //.merge(points)
-      //.sort(function (a, b) { return b.population - a.population; });
       
       //for the circles that exit, do animation as remove
     points.exit()
       .transition().duration(TRANSITION_DURATION)
       .attr('r', 0)
       .remove();
+
+    chart2.counts = d3.nest()
+      .key(function(d) {return d.socname})
+      //.key(function(d) {return d.gender})
+      .entries(txData);
+
+    console.log(chart2.counts)
+
+    var lines=chart2.svg.selectAll('.line')
+      .data(chart2.counts);
+
+    lines.enter().append('line')
+      .attr('class','line')
+      .attr('x1',function (d) {return chart2.x(d.socname["Female"].rank)})
+      .attr('y1',function (d) {return chart2.y(d.socname["Female"].earn)})
+      .attr('x2',function (d) {return chart2.x(d.socname["Male"].rank)})
+      .attr('y2',function (d) {return chart2.y(d.socname["Male"].earn)});  
 
   }
 }
