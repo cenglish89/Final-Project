@@ -6,7 +6,8 @@ var binCount = 10;
 
   //
 d3.queue()
-  .defer(d3.json, 'data/soc_data.json')
+  //.defer(d3.json, 'data/soc_data.json')
+  .defer(d3.json, 'data/fem_soc_data.json')
   .awaitAll(function (error, results) {
     if (error) { throw error; }
     app.initialize(results[0]);
@@ -27,8 +28,8 @@ app = {
 
     // Here we create each of the components on our page, storing them in an array
     app.components = [
-      new Chart('#chart1')
-      //, new Pie('#chart2')
+//      new Chart('#chart1')
+      new Chart2('#chart2')
     ];
 
 
@@ -199,7 +200,7 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
-    txData = app.data.slice();
+    txData = app.data.slice(app.data[0]);
 
     if (app.options.filtered) {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
@@ -263,6 +264,140 @@ Chart.prototype = {
       .attr('y2',chart.y(803))
       .attr('stroke-width',2)
       .attr('stroke','black');   
+
+  }
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////
+function Chart2(selector) {
+  var chart2 = this;
+
+  // SVG and MARGINS
+  var margin = { 
+    top: 20, right: 15, bottom: 130, left: 45
+  };
+
+  chart2.width = 640 - margin.right - margin.left;
+  chart2.height = 500 - margin.top - margin.bottom;
+
+
+  chart2.svg = d3.select(selector)
+    .append('svg')
+    .attr('width', chart2.width + margin.left + margin.right)
+    .attr('height', chart2.height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  // SCALES
+
+  //now in d3 4version
+  chart2.x = d3.scaleLinear()
+      .domain([0, 21])//d3.max(app.data, function (d) {return d.rank;})])
+      .range([0, chart2.width])
+      .nice();
+
+  chart2.y = d3.scaleLinear()
+    .domain([0, d3.max(app.data, function (d) { return d.earn; })])
+    .range([chart2.height, 0])
+    .nice();
+
+  chart2.r = d3.scaleSqrt()
+    .domain([0, d3.max(app.data, function (d) { return d.total; })])
+    .range([0, MAX_RADIUS]);
+
+    //d3 4version
+  chart2.color = d3.scaleThreshold()
+    .domain([1,2,3,4,5])
+    .range(['#eeeeee','#016c59','#fed976','#fd8d3c','#f03b20','#bd0026']);
+
+  // AXES
+    //no more .svg, no more .orient
+  var xAxis = d3.axisBottom()
+                .scale(chart2.x);
+
+
+    
+  var formatAsDollars = d3.format("$.0f")
+
+  var yAxis = d3.axisLeft()
+                    .scale(chart2.y)
+                    .tickFormat(formatAsDollars);
+
+  chart2.svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+    
+  chart2.svg.append("text")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("Median Weekly Earnings");
+
+
+  chart2.update();
+}
+
+Chart2.prototype = {
+  update: function () {
+    var chart2 = this;
+
+    // TRANSFORM DATA
+    //txData2 = app.data.slice(app.data[1]);
+     //   console.log(txData2);
+    txData = app.data.slice(app.data[0]);
+
+
+    if (app.options.filtered) {
+        txData = txData.filter(function (d) { return d.level === app.options.filtered; });
+    } 
+
+    //need to change this
+    if (app.options.socgroup !== 'all') {
+      var socgroup=app.options.socgroup;
+      txData2 = txData2.filter(function (d) {
+        return d.grp_text === socgroup;
+      });
+    }
+
+    //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
+
+    var t = d3.transition().duration(TRANSITION_DURATION)
+
+    // UPDATE CHART ELEMENTS
+
+      //return d.country is a key, look for circle with that label year after year
+      //data function takes data then the key
+    var points=chart2.svg.selectAll('.point')
+      .data(txData, function (d) { return d.socname; });
+
+      //.merge and after is created and previously existing circles
+      //before .merge only applies to the new selections
+
+      //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+      //array find to get location of aggregate
+    points.enter().append('circle')
+      .attr('class','point')
+      .attr('r', 0)
+      .attr('cx', function(d) { return chart2.x(d.rank); })
+      .attr('cy',  function(d) { return chart2.y(d.earn); })
+      .style('stroke',  function (d) {return chart2.color([d.wagegap_group]) })
+      .style('fill', function (d) { return chart2.color([d.wagegap_group]) })
+      .transition(t)
+      .delay(function (d,i){ return (i * 50) })
+      .duration(2500)
+      .attr('r', function (d) { return chart2.r(d.count); });
+
+      //.merge(points)
+      //.sort(function (a, b) { return b.population - a.population; });
+      
+      //for the circles that exit, do animation as remove
+    points.exit()
+      .transition().duration(TRANSITION_DURATION)
+      .attr('r', 0)
+      .remove();
 
   }
 }
