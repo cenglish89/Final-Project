@@ -6,15 +6,16 @@ var binCount = 10;
 
   //
 d3.queue()
-  //.defer(d3.json, 'data/soc_data.json')
+  .defer(d3.json, 'data/soc_data.json')
   .defer(d3.json, 'data/fem_soc_data.json')
   .awaitAll(function (error, results) {
     if (error) { throw error; }
-    app.initialize(results[0]);
+    app.initialize(results[0],results[1]);
   });
 
 app = {
-  data: [],
+  data1: [],
+  data2: [],
   components: [],
 
   options: {
@@ -23,12 +24,15 @@ app = {
     highlight: false,
   },
 
-  initialize: function (data) {
-    app.data = data;
+  initialize: function (data1,data2) {
+    app.data1 = data1;
+    app.data2 = data2;
+
+    //console.log(app.data2);
 
     // Here we create each of the components on our page, storing them in an array
     app.components = [
-//      new Chart('#chart1')
+      new Chart('#chart1'),
       new Chart2('#chart2')
     ];
 
@@ -98,6 +102,7 @@ app = {
 function Chart(selector) {
   var chart = this;
 
+
   // SVG and MARGINS
   var margin = { 
     top: 20, right: 85, bottom: 130, left: 55
@@ -118,17 +123,17 @@ function Chart(selector) {
 
   //now in d3 4version
   chart.x = d3.scaleLinear()
-      .domain([0, d3.max(app.data, function (d) {return d.femper;})])
+      .domain([0, d3.max(app.data1, function (d) {return d.femper;})])
       .range([0, chart.width])
       .nice();
 
   chart.y = d3.scaleLinear()
-    .domain([0, d3.max(app.data, function (d) { return d.earn; })])
+    .domain([0, d3.max(app.data1, function (d) { return d.earn; })])
     .range([chart.height, 0])
     .nice();
 
   chart.r = d3.scaleSqrt()
-    .domain([0, d3.max(app.data, function (d) { return d.total; })])
+    .domain([0, d3.max(app.data1, function (d) { return d.total; })])
     .range([0, MAX_RADIUS]);
 
     //d3 4version
@@ -200,7 +205,7 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
-    txData = app.data.slice(app.data[0]);
+    txData = app.data1.slice();
 
     if (app.options.filtered) {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
@@ -299,12 +304,12 @@ function Chart2(selector) {
       .nice();
 
   chart2.y = d3.scaleLinear()
-    .domain([0, d3.max(app.data, function (d) { return d.earn; })])
+    .domain([0, d3.max(app.data2, function (d) { return d.earn; })])
     .range([chart2.height, 0])
     .nice();
 
   chart2.r = d3.scaleSqrt()
-    .domain([0, d3.max(app.data, function (d) { return d.total; })])
+    .domain([0, d3.max(app.data2, function (d) { return d.total; })])
     .range([0, MAX_RADIUS]);
 
     //d3 4version
@@ -345,13 +350,11 @@ Chart2.prototype = {
     var chart2 = this;
 
     // TRANSFORM DATA
-    //txData2 = app.data.slice(app.data[1]);
-     //   console.log(txData2);
-    txData = app.data.slice(app.data[0]);
+    txData2 = app.data2.slice();
 
 
     if (app.options.filtered) {
-        txData = txData.filter(function (d) { return d.level === app.options.filtered; });
+        txData2 = txData2.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
     //need to change this
@@ -371,7 +374,7 @@ Chart2.prototype = {
       //return d.country is a key, look for circle with that label year after year
       //data function takes data then the key
     var points=chart2.svg.selectAll('.point')
-      .data(txData, function (d) { return d.socname; });
+      .data(txData2, function (d) { return d.socname; });
 
       //.merge and after is created and previously existing circles
       //before .merge only applies to the new selections
@@ -383,7 +386,7 @@ Chart2.prototype = {
       .attr('r', 0)
       .attr('cx', function(d) { return chart2.x(d.rank); })
       .attr('cy',  function(d) { return chart2.y(d.earn); })
-      .style('stroke',  function (d) {return chart2.color([d.wagegap_group]) })
+      .style('stroke', '#333')
       .style('fill', function (d) { return chart2.color([d.wagegap_group]) })
       .transition(t)
       .delay(function (d,i){ return (i * 50) })
@@ -398,20 +401,26 @@ Chart2.prototype = {
 
     chart2.counts = d3.nest()
       .key(function(d) {return d.socname})
-      //.key(function(d) {return d.gender})
-      .entries(txData);
-
-    console.log(chart2.counts)
+      .entries(txData2);
 
     var lines=chart2.svg.selectAll('.line')
       .data(chart2.counts);
 
     lines.enter().append('line')
       .attr('class','line')
-      .attr('x1',function (d) {return chart2.x(d.socname["Female"].rank)})
-      .attr('y1',function (d) {return chart2.y(d.socname["Female"].earn)})
-      .attr('x2',function (d) {return chart2.x(d.socname["Male"].rank)})
-      .attr('y2',function (d) {return chart2.y(d.socname["Male"].earn)});  
+      .attr('x1',function (d) {return chart2.x(d.values[1].rank)})
+      .attr('y1',function (d) {return (chart2.y(d.values[0].earn)-chart2.y(d.values[1].earn))/2})
+      .attr('x2',function (d) {return chart2.x(d.values[0].rank)})
+      .attr('y2',function (d) {return (chart2.y(d.values[0].earn)-chart2.y(d.values[1].earn))/2})
+      .transition(t)
+      .delay(function (d,i){ return (i * 50) })
+      .duration(2500)
+      .attr('y1',function (d) {return chart2.y(d.values[1].earn)})
+      .attr('y2',function (d) {return chart2.y(d.values[0].earn)});  
+
+    lines.exit()
+      .transition().duration(TRANSITION_DURATION)
+      .remove();
 
   }
 }
