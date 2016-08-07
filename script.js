@@ -295,6 +295,7 @@ Chart.prototype = {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
+    //remove previous chart so can see grey colors
     d3.select("#chart1").selectAll(".point").remove();
 
     //filter works using highlight
@@ -461,6 +462,9 @@ Chart2.prototype = {
     // TRANSFORM DATA
     txData2 = app.data2.slice();
 
+    //remove previous chart so can see grey colors
+    d3.select("#chart2").selectAll(".point").remove();
+    d3.select("#chart2").selectAll(".line").remove();
 
     if (app.options.filtered) {
         txData2 = txData2.filter(function (d) { return d.level === app.options.filtered; });
