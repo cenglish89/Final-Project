@@ -39,7 +39,6 @@ app = {
 
     // Add event listeners and the like here
       d3.select('#filter-agg').classed('active', true);
-      //d3.selectAll('#soc-group').classed('hide', true);
 
       d3.select('#filter-agg').on('click', function () {
         if (app.options.filtered === 'agg') {
@@ -303,17 +302,6 @@ Chart.prototype = {
 //        txData = txData.filter(function (d) { return d.highlight.indexOf(app.options.highlight)!==-1; });
 //    } 
 
-//  console.log(app.options.highlight)
-    //not connected to data????
-//    if (app.options.highlight!== false) {
-//        var highlighting = app.options.highlight;
-//        console.log(highlighting)
-//        d3.selectAll('.point').classed('grey',function (d) {return d.highlight.indexOf(highlighting)!==-1;});
-//      } else {
-//        d3.selectAll('.point').classed('grey',function (d) {return app.options.highlight});
-//      }
-
-
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
       txData = txData.filter(function (d) {
@@ -376,11 +364,45 @@ Chart.prototype = {
           return chart.r(d.total);
         }
       })
-      .attr('cx', function(d) { return chart.x(d.femper); })
-      .attr('cy',  function(d) { return chart.y(d.earn); })
+      .attr('cx',  function (d) {
+        if (app.options.filtered==="agg") {
+          return chart.x(d.femper);
+        } else if (app.options.highlight===false) {
+          return chart.x(d.femper_group);
+        } else {
+          return chart.x(d.femper);
+        }
+      })
+      .attr('cy',   function (d) {
+        if (app.options.filtered==="agg") {
+          return chart.y(d.earn);
+        } else if (app.options.highlight===false) {
+          return chart.y(d.earn_group);
+        } else {
+          return chart.y(d.earn);
+        }
+      })
       .transition()
       .duration(TRANSITION_DURATION)
-      .attr('r', function (d) { return chart.r(d.total); });
+      .attr('r', function (d) { return chart.r(d.total); })
+      .attr('cx',  function (d) {
+        if (app.options.filtered==="agg") {
+          return chart.x(d.femper);
+        } else if (app.options.highlight===false) {
+          return chart.x(d.femper);
+        } else {
+          return chart.x(d.femper);
+        }
+      })
+      .attr('cy',   function (d) {
+        if (app.options.filtered==="agg") {
+          return chart.y(d.earn);
+        } else if (app.options.highlight===false) {
+          return chart.y(d.earn);
+        } else {
+          return chart.y(d.earn);
+        }
+      });
       
       //for the circles that exit, do animation as remove
     points.exit()
