@@ -41,12 +41,6 @@
   opacity: .05;
 }
 
-.point.hidden {
-  fill: 'grey';
-  stroke: 'grey';
-  opacity: .5;
-}
-
 .line {
   stroke: rgb(175, 80, 75);
   stroke-width: 2;

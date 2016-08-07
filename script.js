@@ -333,8 +333,6 @@ Chart.prototype = {
     
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
-    var t = d3.transition().duration(TRANSITION_DURATION)
-
     // UPDATE CHART ELEMENTS
 
       //return d.country is a key, look for circle with that label year after year
@@ -342,20 +340,22 @@ Chart.prototype = {
     var points=chart.svg.selectAll('.point')
       .data(txData, function (d) { return d.socname; });
 
-      //.merge and after is created and previously existing circles
-      //before .merge only applies to the new selections
-
       //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
       //array find to get location of aggregate
 
-    console.log(app.options.highlight)
-
     points.enter().append('circle')
       .attr('class','point')
-      .attr('r', 0)
-      .attr('cx', function(d) { return chart.x(d.femper); })
-      .attr('cy',  function(d) { return chart.y(d.earn); })
-      .style('stroke',  function (d) {return chart.color([d.wagegap_group]) })
+      .style('stroke',  function (d) {
+        if (app.options.filtered==="agg") {
+          return chart.color([d.wagegap_group]);
+        } else if (app.options.highlight===false) {
+          return chart.color([d.wagegap_group]);
+        } else if (d.highlight.indexOf(app.options.highlight)===-1) {
+                return '#999999';
+              } else {
+                return chart.color([d.wagegap_group]);
+              }
+             })
       .style('fill', function (d) { 
         if (app.options.filtered==="agg") {
           return chart.color([d.wagegap_group]);
@@ -367,14 +367,24 @@ Chart.prototype = {
                 return chart.color([d.wagegap_group]);
               }
              })
-       // return chart.color([d.wagegap_group]) })
-      .transition(t)
+      .attr('r', function (d) {
+        if (app.options.filtered==="agg") {
+          return 0;
+        } else if (app.options.highlight===false) {
+          return 0;
+        } else {
+          return chart.r(d.total);
+        }
+      })
+      .attr('cx', function(d) { return chart.x(d.femper); })
+      .attr('cy',  function(d) { return chart.y(d.earn); })
+      .transition()
+      .duration(TRANSITION_DURATION)
       .attr('r', function (d) { return chart.r(d.total); });
       
       //for the circles that exit, do animation as remove
     points.exit()
       .transition().duration(TRANSITION_DURATION)
-      .attr('r', 0)
       .remove();
 
     var line = chart.svg.append('line')
@@ -385,12 +395,6 @@ Chart.prototype = {
       .attr('stroke-width',2)
       .attr('stroke','black');   
 
-    //hide (grey out) the circles not in this group
-//    if (app.options.highlight !== false) {
-//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal!==app.options.highlight});
-//      } else {
-//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal===app.options.highlight});
-//      }
 
   }
 }
@@ -480,8 +484,6 @@ Chart2.prototype = {
 
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
-    var t = d3.transition().duration(TRANSITION_DURATION)
-
     // UPDATE CHART ELEMENTS
 
     //data function takes data then the key
@@ -495,7 +497,8 @@ Chart2.prototype = {
       .attr('cy',  function(d) { return chart2.y(d.earn); })
       .style('stroke', '#333')
       .style('fill', function (d) { return chart2.color([d.wagegap_group]) })
-      .transition(t)
+      .transition()
+      .duration(TRANSITION_DURATION)
       .delay(function (d,i){ return (i * 50) })
       .attr('r', function (d) { return chart2.r(d.count); });
       
@@ -510,9 +513,6 @@ Chart2.prototype = {
       .key(function(d) {return d.socname})
       .entries(txData2);
 
-    console.log(chart2.counts)
-    console.log(chart2.counts[1].values[0].earn)
-
     var lines=chart2.svg.selectAll('.line')
       .data(chart2.counts);
 
@@ -522,7 +522,7 @@ Chart2.prototype = {
       .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .attr('x2',function (d) {return chart2.x(d.values[0].rank)})
       .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
-      .transition(t)
+      .transition()
       .delay(function (d,i){ return (i * 50) })
       .duration(TRANSITION_DURATION)
       .attr('y1',function (d) {return chart2.y(d.values[1].earn)})
