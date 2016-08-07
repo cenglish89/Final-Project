@@ -298,10 +298,6 @@ function Chart2(selector) {
   // SCALES
 
   //now in d3 4version
-  chart2.x = d3.scaleLinear()
-      .domain([0, 21])//d3.max(app.data, function (d) {return d.rank;})])
-      .range([0, chart2.width])
-      .nice();
 
   chart2.y = d3.scaleLinear()
     .domain([0, d3.max(app.data2, function (d) { return d.earn; })])
@@ -319,10 +315,6 @@ function Chart2(selector) {
 
   // AXES
     //no more .svg, no more .orient
-  var xAxis = d3.axisBottom()
-                .scale(chart2.x);
-
-
     
   var formatAsDollars = d3.format("$.0f")
 
@@ -357,6 +349,14 @@ Chart2.prototype = {
         txData2 = txData2.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
+    chart2.x = d3.scaleLinear()
+        .domain([0, d3.max(txData2, function (d) {return d.rank;})])
+        .range([0, chart2.width])
+        .nice();
+
+    var xAxis = d3.axisBottom()
+                  .scale(chart2.x);
+
     //need to change this
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
@@ -371,16 +371,10 @@ Chart2.prototype = {
 
     // UPDATE CHART ELEMENTS
 
-      //return d.country is a key, look for circle with that label year after year
-      //data function takes data then the key
+    //data function takes data then the key
     var points=chart2.svg.selectAll('.point')
       .data(txData2, function (d) { return d.socname; });
 
-      //.merge and after is created and previously existing circles
-      //before .merge only applies to the new selections
-
-      //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-      //array find to get location of aggregate
     points.enter().append('circle')
       .attr('class','point')
       .attr('r', 0)
@@ -398,9 +392,13 @@ Chart2.prototype = {
       .attr('r', 0)
       .remove();
 
+    //nest data for the lines
     chart2.counts = d3.nest()
       .key(function(d) {return d.socname})
       .entries(txData2);
+
+    console.log(chart2.counts)
+    console.log(chart2.counts[1].values[0].earn)
 
     var lines=chart2.svg.selectAll('.line')
       .data(chart2.counts);
