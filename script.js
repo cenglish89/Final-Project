@@ -383,7 +383,7 @@ Chart.prototype = {
         }
       })
       .transition()
-      .duration(TRANSITION_DURATION)
+      .duration(1500)
       .attr('r', function (d) { return chart.r(d.total); })
       .attr('cx',  function (d) {
         if (app.options.filtered==="agg") {
@@ -514,11 +514,29 @@ Chart2.prototype = {
 
     points.enter().append('circle')
       .attr('class','point')
-      .attr('r', 0)
+      .attr('r', function (d) {
+        if (app.options.filtered==="agg") {
+          return 0;
+        } else if (app.options.highlight===false) {
+          return 0;
+        } else {
+          return chart2.r(d.count);
+        }
+      })
       .attr('cx', function(d) { return chart2.x(d.rank); })
       .attr('cy',  function(d) { return chart2.y(d.earn); })
       .style('stroke', '#333')
-      .style('fill', function (d) { return chart2.color([d.wagegap_group]) })
+      .style('fill', function (d) { 
+        if (app.options.filtered==="agg") {
+          return chart2.color([d.wagegap_group]);
+        } else if (app.options.highlight===false) {
+          return chart2.color([d.wagegap_group]);
+        } else if (d.highlight.indexOf(app.options.highlight)===-1) {
+                return '#999999';
+              } else {
+                return chart2.color([d.wagegap_group]);
+              }
+             })
       .transition()
       .duration(TRANSITION_DURATION)
       .delay(function (d,i){ return (i * 50) })
@@ -541,9 +559,19 @@ Chart2.prototype = {
     lines.enter().append('line')
       .attr('class','line')
       .attr('x1',function (d) {return chart2.x(d.values[1].rank)})
-      .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
+      .attr('y1',function (d) { if (app.options.highlight===false) {
+          return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2;
+        } else {
+           return chart2.y(d.values[1].earn);
+        }
+        })
       .attr('x2',function (d) {return chart2.x(d.values[0].rank)})
-      .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
+      .attr('y2',function (d) { if (app.options.highlight===false) {
+          return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2;
+        } else {
+           return chart2.y(d.values[0].earn);
+        }
+        })
       .transition()
       .delay(function (d,i){ return (i * 50) })
       .duration(TRANSITION_DURATION)
