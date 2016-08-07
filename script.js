@@ -295,15 +295,21 @@ Chart.prototype = {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
-    //filter works using highlight
-    if (app.options.highlight!== false) {
-        txData = txData.filter(function (d) { return d.highlight.indexOf(app.options.highlight)!==-1; });
-    } 
+    d3.select("#chart1").selectAll(".point").remove();
 
+    //filter works using highlight
 //    if (app.options.highlight!== false) {
-//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal!==app.options.highlight});
+//        txData = txData.filter(function (d) { return d.highlight.indexOf(app.options.highlight)!==-1; });
+//    } 
+
+//  console.log(app.options.highlight)
+    //not connected to data????
+//    if (app.options.highlight!== false) {
+//        var highlighting = app.options.highlight;
+//        console.log(highlighting)
+//        d3.selectAll('.point').classed('grey',function (d) {return d.highlight.indexOf(highlighting)!==-1;});
 //      } else {
-//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal===app.options.highlight});
+//        d3.selectAll('.point').classed('grey',function (d) {return app.options.highlight});
 //      }
 
 
@@ -350,13 +356,17 @@ Chart.prototype = {
       .attr('cy',  function(d) { return chart.y(d.earn); })
       .style('stroke',  function (d) {return chart.color([d.wagegap_group]) })
       .style('fill', function (d) { 
-         // if (app.options.highlight === false) {
-         //       return chart.color([d.wagegap_group]);
-         //     } else {
-         //       return '#999999';
-         //     }
-         //    })
-        return chart.color([d.wagegap_group]) })
+        if (app.options.filtered==="agg") {
+          return chart.color([d.wagegap_group]);
+        } else if (app.options.highlight===false) {
+          return chart.color([d.wagegap_group]);
+        } else if (d.highlight.indexOf(app.options.highlight)===-1) {
+                return '#999999';
+              } else {
+                return chart.color([d.wagegap_group]);
+              }
+             })
+       // return chart.color([d.wagegap_group]) })
       .transition(t)
       .attr('r', function (d) { return chart.r(d.total); });
       
