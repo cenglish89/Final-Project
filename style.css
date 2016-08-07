@@ -41,8 +41,9 @@
   opacity: .05;
 }
 
-.point.grey {
+.point.hidden {
   fill: 'grey';
+  stroke: 'grey';
   opacity: .5;
 }
 

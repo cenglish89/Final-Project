@@ -82,6 +82,90 @@ app = {
         app.components.forEach(function (d) {d.update(); });
       });
 
+    d3.select('#highlight-mTotal').on('click', function () {
+        if (app.options.highlight === 'mTotal') {
+          app.options.highlight = false;
+          d3.select('#highlight-mTotal').classed('active', false);
+        } else {
+          app.options.highlight = 'mTotal';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-mTotal').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-wPercent').on('click', function () {
+        if (app.options.highlight === 'wPercent') {
+          app.options.highlight = false;
+          d3.select('#highlight-wPercent').classed('active', false);
+        } else {
+          app.options.highlight = 'wPercent';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-wPercent').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-mPercent').on('click', function () {
+        if (app.options.highlight === 'mPercent') {
+          app.options.highlight = false;
+          d3.select('#highlight-mPercent').classed('active', false);
+        } else {
+          app.options.highlight = 'mPercent';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-mPercent').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-highEarn').on('click', function () {
+        if (app.options.highlight === 'highEarn') {
+          app.options.highlight = false;
+          d3.select('#highlight-highEarn').classed('active', false);
+        } else {
+          app.options.highlight = 'highEarn';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-highEarn').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-lowEarn').on('click', function () {
+        if (app.options.highlight === 'lowEarn') {
+          app.options.highlight = false;
+          d3.select('#highlight-lowEarn').classed('active', false);
+        } else {
+          app.options.highlight = 'lowEarn';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-lowEarn').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-bigGap').on('click', function () {
+        if (app.options.highlight === 'bigGap') {
+          app.options.highlight = false;
+          d3.select('#highlight-bigGap').classed('active', false);
+        } else {
+          app.options.highlight = 'bigGap';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-bigGap').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
+    d3.select('#highlight-smallGap').on('click', function () {
+        if (app.options.highlight === 'smallGap') {
+          app.options.highlight = false;
+          d3.select('#highlight-smallGap').classed('active', false);
+        } else {
+          app.options.highlight = 'smallGap';
+          d3.selectAll('.highlight').classed('active', false);
+          d3.select('#highlight-smallGap').classed('active', true);
+        }
+        app.components.forEach(function (d) {d.update(); });
+      });
+
 
     // app.resize() will be called anytime the page size is changed
     d3.select('window').on('resize', app.resize);
@@ -211,6 +295,17 @@ Chart.prototype = {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
     } 
 
+    //filter works using highlight
+    if (app.options.highlight!== false) {
+        txData = txData.filter(function (d) { return d.highlight.indexOf(app.options.highlight)!==-1; });
+    } 
+
+//    if (app.options.highlight!== false) {
+//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal!==app.options.highlight});
+//      } else {
+//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal===app.options.highlight});
+//      }
+
 
     if (app.options.socgroup !== 'all') {
       var socgroup=app.options.socgroup;
@@ -227,6 +322,7 @@ Chart.prototype = {
        d3.selectAll('#soc-group').classed('hide', false);
        d3.selectAll('#detail-filter.filter').classed('hide', false);
     }
+
     
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
@@ -244,17 +340,25 @@ Chart.prototype = {
 
       //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
       //array find to get location of aggregate
+
+    console.log(app.options.highlight)
+
     points.enter().append('circle')
       .attr('class','point')
       .attr('r', 0)
       .attr('cx', function(d) { return chart.x(d.femper); })
       .attr('cy',  function(d) { return chart.y(d.earn); })
       .style('stroke',  function (d) {return chart.color([d.wagegap_group]) })
-      .style('fill', function (d) { return chart.color([d.wagegap_group]) })
+      .style('fill', function (d) { 
+         // if (app.options.highlight === false) {
+         //       return chart.color([d.wagegap_group]);
+         //     } else {
+         //       return '#999999';
+         //     }
+         //    })
+        return chart.color([d.wagegap_group]) })
       .transition(t)
       .attr('r', function (d) { return chart.r(d.total); });
-      //.merge(points)
-      //.sort(function (a, b) { return b.population - a.population; });
       
       //for the circles that exit, do animation as remove
     points.exit()
@@ -269,6 +373,13 @@ Chart.prototype = {
       .attr('y2',chart.y(803))
       .attr('stroke-width',2)
       .attr('stroke','black');   
+
+    //hide (grey out) the circles not in this group
+//    if (app.options.highlight !== false) {
+//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal!==app.options.highlight});
+//      } else {
+//        d3.selectAll('.point').classed('grey',function (d) {return d.wTotal===app.options.highlight});
+//      }
 
   }
 }
@@ -296,9 +407,6 @@ function Chart2(selector) {
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   // SCALES
-
-  //now in d3 4version
-
   chart2.y = d3.scaleLinear()
     .domain([0, d3.max(app.data2, function (d) { return d.earn; })])
     .range([chart2.height, 0])
@@ -314,8 +422,7 @@ function Chart2(selector) {
     .range(['#eeeeee','#016c59','#fed976','#fd8d3c','#f03b20','#bd0026']);
 
   // AXES
-    //no more .svg, no more .orient
-    
+  
   var formatAsDollars = d3.format("$.0f")
 
   var yAxis = d3.axisLeft()
@@ -356,14 +463,6 @@ Chart2.prototype = {
 
     var xAxis = d3.axisBottom()
                   .scale(chart2.x);
-
-    //need to change this
-    if (app.options.socgroup !== 'all') {
-      var socgroup=app.options.socgroup;
-      txData2 = txData2.filter(function (d) {
-        return d.grp_text === socgroup;
-      });
-    }
 
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
