@@ -390,7 +390,6 @@ Chart2.prototype = {
       .style('fill', function (d) { return chart2.color([d.wagegap_group]) })
       .transition(t)
       .delay(function (d,i){ return (i * 50) })
-      .duration(2500)
       .attr('r', function (d) { return chart2.r(d.count); });
       
       //for the circles that exit, do animation as remove
@@ -409,17 +408,19 @@ Chart2.prototype = {
     lines.enter().append('line')
       .attr('class','line')
       .attr('x1',function (d) {return chart2.x(d.values[1].rank)})
-      .attr('y1',function (d) {return (chart2.y(d.values[0].earn)-chart2.y(d.values[1].earn))/2})
+      .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .attr('x2',function (d) {return chart2.x(d.values[0].rank)})
-      .attr('y2',function (d) {return (chart2.y(d.values[0].earn)-chart2.y(d.values[1].earn))/2})
+      .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .transition(t)
       .delay(function (d,i){ return (i * 50) })
-      .duration(2500)
+      .duration(TRANSITION_DURATION)
       .attr('y1',function (d) {return chart2.y(d.values[1].earn)})
       .attr('y2',function (d) {return chart2.y(d.values[0].earn)});  
 
     lines.exit()
       .transition().duration(TRANSITION_DURATION)
+      .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
+      .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .remove();
 
   }
