@@ -311,11 +311,11 @@ Chart.prototype = {
 
     //Hide the options for detailed looks until ready for it
     if (app.options.filtered === 'agg') {
-      d3.selectAll('#soc-group').classed('hide', true);  
-      d3.selectAll('#detail-filter.filter').classed('hide', true);
+      d3.selectAll('#soc-group').classed('invisible', true);  
+      d3.selectAll('#detail-filter.filter').classed('invisible', true);
     } else {
-       d3.selectAll('#soc-group').classed('hide', false);
-       d3.selectAll('#detail-filter.filter').classed('hide', false);
+       d3.selectAll('#soc-group').classed('invisible', false);
+       d3.selectAll('#detail-filter.filter').classed('invisible', false);
     }
 
     
@@ -333,6 +333,7 @@ Chart.prototype = {
 
     points.enter().append('circle')
       .attr('class','point')
+      .sort(function (a, b) { return b.total - a.total; })
       .style('stroke',  function (d) {
         if (app.options.filtered==="agg") {
           return chart.color([d.wagegap_group]);
