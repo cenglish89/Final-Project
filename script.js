@@ -280,6 +280,10 @@ function Chart(selector) {
     .style("text-anchor", "start")
     .text("Earnings"); 
 
+  chart.tooltip = d3.select("body").append("div")   
+          .attr("class", "tooltip")               
+          .style("opacity", 0);
+
   chart.update();
 }
 
@@ -383,6 +387,19 @@ Chart.prototype = {
           return chart.y(d.earn);
         }
       })
+      .on("mouseover", function(d) {
+        chart.tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+        chart.tooltip.html(d.socname)
+          .style("left", (d3.event.pageX) + "px")   
+          .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            chart.tooltip.transition()    
+                .duration(500)    
+                .style("opacity", 0);
+          })
       .transition()
       .duration(1500)
       .attr('r', function (d) { return chart.r(d.total); })
@@ -417,7 +434,6 @@ Chart.prototype = {
       .attr('y2',chart.y(803))
       .attr('stroke-width',2)
       .attr('stroke','black');   
-
 
   }
 }
