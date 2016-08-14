@@ -36,6 +36,9 @@ app = {
       new Chart2('#chart2')
     ];
 
+    // app.resize() will be called anytime the page size is changed
+    d3.select(window).on('resize', app.resize);
+
 
     // Add event listeners and the like here
       d3.select('#filter-agg').classed('active', true);
@@ -187,32 +190,26 @@ function Chart(selector) {
 
 
   // SVG and MARGINS
-  var margin = { 
-    top: 20, right: 85, bottom: 130, left: 55
+  chart.margin = { 
+    top: 20, right: 85, bottom: 130, left: 60
   };
 
-  chart.width = 640 - margin.right - margin.left;
-  chart.height = 500 - margin.top - margin.bottom;
+  chart.parentEl = d3.select(selector)
 
-
-  chart.svg = d3.select(selector)
+  chart.svg = chart.parentEl
     .append('svg')
-    .attr('width', chart.width + margin.left + margin.right)
-    .attr('height', chart.height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    .attr('transform', 'translate(' + chart.margin.left + ',' + chart.margin.top + ')');
 
   // SCALES
 
   //now in d3 4version
   chart.x = d3.scaleLinear()
-      .domain([0, d3.max(app.data1, function (d) {return d.femper;})])
-      .range([0, chart.width])
-      .nice();
+    .domain([0, d3.max(app.data1, function (d) {return d.femper;})])
+    .nice();
 
   chart.y = d3.scaleLinear()
     .domain([0, d3.max(app.data1, function (d) { return d.earn; })])
-    .range([chart.height, 0])
     .nice();
 
   chart.r = d3.scaleSqrt()
@@ -228,18 +225,14 @@ function Chart(selector) {
     //no more .svg, no more .orient
   var formatAsPercentage = d3.format(".0%");
 
-  var xAxis = d3.axisBottom()
+  chart.xAxis = d3.axisBottom()
                 .scale(chart.x)
                 .tickFormat(formatAsPercentage);
 
-  chart.svg.append("g")
-    .attr("class", "x axis")
-    .attr('transform', 'translate(0,' + chart.height + ')')
-    .call(xAxis);
+  chart.gx=chart.svg.append("g")
+    .attr("class", "x axis");
     
-  chart.svg.append('text')
-    .attr('x', chart.width/2)
-    .attr('y', chart.height+margin.top)
+  chart.xLabel = chart.gx.append('text')
     .attr('dy', ".71em")
     .style('text-anchor', "middle")
     .text('Percent of Workers that are Women');
@@ -247,47 +240,92 @@ function Chart(selector) {
 
   var formatAsDollars = d3.format("$.0f")
 
-  var yAxis = d3.axisLeft()
-                    .scale(chart.y)
-                    .tickFormat(formatAsDollars);
+  chart.yAxis= d3.axisRight()
+              .scale(chart.y)
+              .tickFormat(formatAsDollars);
 
-  chart.svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis);
+  chart.gy = chart.svg.append("g")
+    .attr("class", "y axis");
     
-  chart.svg.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("x", -1*(chart.height/2))
-    .attr("y", -1*(chart.width/9))
-    .attr("dy", ".71em")
-    .style("text-anchor", "middle")
-    .text("Median Weekly Earnings");
-
-
- chart.svg.append("g")
-    .append("text")
-    .attr("x", chart.width+5)
-    .attr("y", chart.y(870))
+  chart.nat1 = chart.svg.append("text")
+    .attr("x", -60)
     .attr("dy", ".71em")
     .style("text-anchor", "start")
-    .text("Total Median");
+    .text("National");
 
- chart.svg.append("g")
-    .append("text")
-    .attr("x", chart.width+5)
-    .attr("y", chart.y(770))
+  chart.nat2 = chart.svg.append("text")
+    .attr("x", -60)
     .attr("dy", ".71em")
     .style("text-anchor", "start")
-    .text("Earnings"); 
+    .text("Median");
+
+  chart.nat3 = chart.svg.append("text")
+    .attr("x", -60)
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("Earnings");
+ 
 
   chart.tooltip = d3.select("body").append("div")   
           .attr("class", "tooltip")               
           .style("opacity", 0);
 
-  chart.update();
+  chart.med = chart.svg.append("text")
+    .attr("y", -20)
+    .attr("dy", ".71em")
+    .style("text-anchor", "middle")
+    .text("Median");
+
+  chart.line = chart.svg.append('line')
+      .attr('x1',0)
+      .attr('stroke-width',2)
+      .attr('stroke','black');  
+
+  chart.resize();
 }
 
 Chart.prototype = {
+  resize: function() {
+    var chart = this;
+
+      //width in browser
+      var width = chart.parentEl.node().offsetWidth;
+
+      chart.width = width - chart.margin.left - chart.margin.right;
+      chart.height = 400 - chart.margin.top - chart.margin.bottom;
+
+      chart.parentEl.select('svg')
+        .attr('width', chart.width + chart.margin.left + chart.margin.right)
+        .attr('height', chart.height + chart.margin.top + chart.margin.bottom);
+
+      chart.x.range([0, chart.width]);
+      chart.y.range([chart.height, 0]);
+
+      chart.gx.call(chart.xAxis)
+        .attr('transform', 'translate(0,' + chart.height + ')')
+      chart.gy.call(chart.yAxis)
+        .attr('transform', 'translate(' + chart.width + ',0)');
+
+      chart.xLabel
+        .attr('x', chart.width/2)
+        .attr('y', chart.height+chart.margin.top);
+      chart.med
+        .attr("x", chart.width);
+      chart.nat1
+        .attr("y", chart.y(970));
+      chart.nat2
+        .attr("y", chart.y(870));
+      chart.nat3
+        .attr("y", chart.y(770));
+    
+      chart.line
+        .attr('y1',chart.y(803))
+        .attr('x2',chart.width)
+        .attr('y2',chart.y(803));
+
+    chart.update()
+  },
+
   update: function () {
     var chart = this;
 
@@ -438,14 +476,7 @@ Chart.prototype = {
     points.exit()
       .transition().duration(TRANSITION_DURATION)
       .remove();
-
-    var line = chart.svg.append('line')
-      .attr('x1',0)
-      .attr('y1',chart.y(803))
-      .attr('x2',chart.width)
-      .attr('y2',chart.y(803))
-      .attr('stroke-width',2)
-      .attr('stroke','black');   
+ 
 
   }
 }
@@ -474,7 +505,7 @@ function Chart2(selector) {
 
   // SCALES
   chart2.y = d3.scaleLinear()
-    .domain([0, d3.max(app.data2, function (d) { return d.earn; })])
+    .domain([0, 2200])
     .range([chart2.height, 0])
     .nice();
 
@@ -488,24 +519,35 @@ function Chart2(selector) {
     .range(['#eeeeee','#016c59','#fed976','#fd8d3c','#f03b20','#bd0026']);
 
   // AXES
-  
-  var formatAsDollars = d3.format("$.0f")
+chart2.currentWidth = d3.select('#chart2').node().getBoundingClientRect().width;
 
-  var yAxis = d3.axisLeft()
-                    .scale(chart2.y)
-                    .tickFormat(formatAsDollars);
+  if (chart2.currentWidth < 400) {
+    var formatAsDollars = d3.format("$.0f")
 
-  chart2.svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis);
-    
-  chart2.svg.append("text")
+    var yAxis = d3.axisLeft()
+                      .scale(chart2.y)
+                      .tickFormat(formatAsDollars);
+
+    chart2.svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+    chart2.svg.append("text")
     .attr("x", 0)
     .attr("y", 0)
     .attr("dy", ".71em")
     .style("text-anchor", "start")
     .text("Median Weekly Earnings");
 
+   } else {
+  chart2.svg.append("text")
+    .attr("x", -45)
+    .attr("y", -20)
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("Weekly Earnings");
+
+  }
 
   chart2.update();
 }
@@ -612,6 +654,14 @@ Chart2.prototype = {
       .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .remove();
+
+    var line = chart2.svg.append('line')
+      .attr('x1',-35)
+      .attr('y1',chart2.y(803))
+      .attr('x2',chart2.width)
+      .attr('y2',chart2.y(803))
+      .attr('stroke-width',2)
+      .attr('stroke','black'); 
 
   }
 }
