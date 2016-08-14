@@ -335,6 +335,7 @@ Chart.prototype = {
       //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
       //array find to get location of aggregate
 
+      //Tooltip code from talking to Vivian
     points.enter().append('circle')
       .attr('class','point')
       .sort(function (a, b) { return b.total - a.total; })
@@ -390,7 +391,16 @@ Chart.prototype = {
       .on("mouseover", function(d) {
         chart.tooltip.transition()
           .duration(200)
-          .style("opacity", .9);
+          .style("opacity", .9)
+          var select_group = d.group
+          d3.selectAll(".path")
+            .style("opacity", function(d) {
+              return d.group.indexOf(select_group) ? 0.2 : 1;
+            })
+            .style("stroke", function(d) {
+              return d.group.indexOf(select_group) ? 0.2 : 1;
+            })
+            ;
         chart.tooltip.html(d.socname)
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
@@ -398,7 +408,9 @@ Chart.prototype = {
         .on("mouseout", function(d) {   
             chart.tooltip.transition()    
                 .duration(500)    
-                .style("opacity", 0);
+                .style("opacity", 0)
+            d3.selectAll(".path")
+            .style("opacity", 0.8);
           })
       .transition()
       .duration(1500)
@@ -530,7 +542,7 @@ Chart2.prototype = {
       .data(txData2, function (d) { return d.socname; });
 
     points.enter().append('circle')
-      .attr('class','point')
+      .attr('class','point path')
       .attr('r', function (d) {
         if (app.options.filtered==="agg") {
           return 0;
