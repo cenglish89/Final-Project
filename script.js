@@ -292,7 +292,7 @@ Chart.prototype = {
       var width = chart.parentEl.node().offsetWidth;
 
       chart.width = width - chart.margin.left - chart.margin.right;
-      chart.height = 400 - chart.margin.top - chart.margin.bottom;
+      chart.height = 500 - chart.margin.top - chart.margin.bottom;
 
       chart.parentEl.select('svg')
         .attr('width', chart.width + chart.margin.left + chart.margin.right)
@@ -462,7 +462,7 @@ Chart.prototype = {
           return chart.x(d.femper);
         }
       })
-      .attr('cy',   function (d) {
+      .attr('cy', function (d) {
         if (app.options.filtered==="agg") {
           return chart.y(d.earn);
         } else if (app.options.highlight===false) {
@@ -488,25 +488,20 @@ function Chart2(selector) {
   var chart2 = this;
 
   // SVG and MARGINS
-  var margin = { 
+  chart2.margin = { 
     top: 20, right: 15, bottom: 130, left: 45
   };
 
-  chart2.width = 640 - margin.right - margin.left;
-  chart2.height = 500 - margin.top - margin.bottom;
+  chart2.parentEl = d3.select(selector)
 
-
-  chart2.svg = d3.select(selector)
+  chart2.svg = chart2.parentEl
     .append('svg')
-    .attr('width', chart2.width + margin.left + margin.right)
-    .attr('height', chart2.height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    .attr('transform', 'translate(' + chart2.margin.left + ',' + chart2.margin.top + ')');
 
   // SCALES
   chart2.y = d3.scaleLinear()
     .domain([0, 2200])
-    .range([chart2.height, 0])
     .nice();
 
   chart2.r = d3.scaleSqrt()
@@ -519,40 +514,64 @@ function Chart2(selector) {
     .range(['#eeeeee','#016c59','#fed976','#fd8d3c','#f03b20','#bd0026']);
 
   // AXES
-chart2.currentWidth = d3.select('#chart2').node().getBoundingClientRect().width;
-
-  if (chart2.currentWidth < 400) {
     var formatAsDollars = d3.format("$.0f")
 
-    var yAxis = d3.axisLeft()
+    chart2.yAxis = d3.axisLeft()
                       .scale(chart2.y)
                       .tickFormat(formatAsDollars);
 
-    chart2.svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
+    chart2.gy = chart2.svg.append('g')
+      .attr('class', 'y axis');
 
-    chart2.svg.append("text")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("dy", ".71em")
-    .style("text-anchor", "start")
-    .text("Median Weekly Earnings");
+    chart2.gy.append('text')
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("dy", ".71em")
+      .style("text-anchor", "start")
+      .text("Median Weekly Earnings");
 
-   } else {
-  chart2.svg.append("text")
-    .attr("x", -45)
-    .attr("y", -20)
-    .attr("dy", ".71em")
-    .style("text-anchor", "start")
-    .text("Weekly Earnings");
+    chart2.gy.append('text')
+      .attr("x", -chart2.margin.left)
+      .attr("y", -chart2.margin.top)
+      .attr("dy", ".71em")
+      .style("text-anchor", "start")
+      .text("Weekly Earnings");
 
-  }
+    chart2.line = chart2.svg.append('line')
+      .attr('stroke-width',2)
+      .attr('stroke','black'); 
 
-  chart2.update();
+  chart2.resize();
 }
 
 Chart2.prototype = {
+  resize: function () {
+    var chart2 = this;
+
+    //width in browser
+    var width = chart2.parentEl.node().offsetWidth;
+
+    chart2.width = width - chart2.margin.left - chart2.margin.right;
+    chart2.height = 500 - chart2.margin.top - chart2.margin.bottom;
+
+    //console.log(chart2.width, chart2.height)
+    chart2.parentEl.select('svg')
+      .attr('width', chart2.width + chart2.margin.left + chart2.margin.right)
+      .attr('height', chart2.height + chart2.margin.top + chart2.margin.bottom);
+
+    chart2.y.range([chart2.height, 0]);
+
+    chart2.gy.call(chart2.yAxis);
+
+    chart2.line
+      .attr('x1',0)
+      .attr('y1',chart2.y(803))
+      .attr('x2',chart2.width)
+      .attr('y2',chart2.y(803));
+
+    chart2.update()
+  },
+
   update: function () {
     var chart2 = this;
 
@@ -654,14 +673,6 @@ Chart2.prototype = {
       .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .remove();
-
-    var line = chart2.svg.append('line')
-      .attr('x1',-35)
-      .attr('y1',chart2.y(803))
-      .attr('x2',chart2.width)
-      .attr('y2',chart2.y(803))
-      .attr('stroke-width',2)
-      .attr('stroke','black'); 
 
   }
 }
