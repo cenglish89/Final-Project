@@ -395,10 +395,10 @@ Chart.prototype = {
           var select_group = d.group
           d3.selectAll(".path")
             .style("opacity", function(d) {
-              return d.group.indexOf(select_group) ? 0.2 : 1;
+              return select_group.indexOf(d.group) ==-1 ? 0.2 : 1;
             })
             .style("stroke", function(d) {
-              return d.group.indexOf(select_group) ? 0.2 : 1;
+              return select_group.indexOf(d.group) ==-1 ? 0.2 : 1;
             })
             ;
         chart.tooltip.html(d.socname)
