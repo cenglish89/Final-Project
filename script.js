@@ -585,6 +585,10 @@ function Chart2(selector) {
 
   }    
 
+  chart2.tooltip = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
+
   chart2.resize();
 }
 
@@ -660,6 +664,7 @@ Chart2.prototype = {
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
     // UPDATE CHART ELEMENTS
+    var formatAsDollars = d3.format("$.0f")
 
     //data function takes data then the key
     var points=chart2.svg.selectAll('.point')
@@ -667,6 +672,19 @@ Chart2.prototype = {
 
     points.enter().append('circle')
       .attr('class','point path')
+      .on("mouseover", function(d) {
+        chart2.tooltip.transition()
+          .duration(200)
+          .style("opacity", .9)   
+        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn))
+          .style("left", (d3.event.pageX) + "px")   
+          .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            chart2.tooltip.transition()    
+                .duration(500)    
+                .style("opacity", 0)
+          })
       .attr('r', function (d) {
         if (app.options.filtered==="agg") {
           return 0;

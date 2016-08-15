@@ -48,7 +48,8 @@
 
 div.tooltip {
   padding: .5em 1em;
-  background: rgba(0,0,0,.75);
+  background: #216C2A;
+  opactiy: 0.75;
   color: white;
   font-size: 13px;
   font-weight: 700;
