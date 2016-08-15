@@ -191,7 +191,7 @@ function Chart(selector) {
 
   // SVG and MARGINS
   chart.margin = { 
-    top: 20, right: 85, bottom: 130, left: 60
+    top: 20, right: 40, bottom: 130, left: 60
   };
 
   chart.parentEl = d3.select(selector)
@@ -232,7 +232,7 @@ function Chart(selector) {
   chart.gx=chart.svg.append("g")
     .attr("class", "x axis");
     
-  chart.xLabel = chart.gx.append('text')
+  chart.xLabel = chart.svg.append('text')
     .attr('dy', ".71em")
     .style('text-anchor', "middle")
     .text('Percent of Workers that are Women');
@@ -270,16 +270,28 @@ function Chart(selector) {
           .attr("class", "tooltip")               
           .style("opacity", 0);
 
-  chart.med = chart.svg.append("text")
-    .attr("y", -20)
-    .attr("dy", ".71em")
-    .style("text-anchor", "middle")
-    .text("Median");
-
   chart.line = chart.svg.append('line')
       .attr('x1',0)
       .attr('stroke-width',2)
       .attr('stroke','black');  
+
+  if(screen.width < 992) {
+
+    chart.med = chart.svg.append("text")
+      .attr("y", -20)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Median Weekly Earnings");
+
+  } else {
+
+    chart.med = chart.svg.append("text")
+      .attr("y", -20)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Median");
+
+  }
 
   chart.resize();
 }
@@ -310,7 +322,7 @@ Chart.prototype = {
         .attr('x', chart.width/2)
         .attr('y', chart.height+chart.margin.top);
       chart.med
-        .attr("x", chart.width);
+        .attr("x", chart.width+chart.margin.right-5);
       chart.nat1
         .attr("y", chart.y(970));
       chart.nat2
@@ -488,9 +500,15 @@ function Chart2(selector) {
   var chart2 = this;
 
   // SVG and MARGINS
-  chart2.margin = { 
-    top: 20, right: 15, bottom: 130, left: 45
-  };
+  if(screen.width < 992) {
+    chart2.margin = { 
+      top: 20, right: 15, bottom: 130, left: 45
+    };
+  } else {
+    chart2.margin = { 
+      top: 20, right: 15, bottom: 130, left: 0
+    };
+  }
 
   chart2.parentEl = d3.select(selector)
 
@@ -523,16 +541,40 @@ function Chart2(selector) {
     chart2.gy = chart2.svg.append('g')
       .attr('class', 'y axis');
 
-    chart2.gy.append('text')
-      .attr("x", 0)
-      .attr("y", 0)
+
+  if(screen.width < 992) {
+
+    chart2.nat1 = chart2.svg.append("text")
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("National");
+
+    chart2.nat2 = chart2.svg.append("text")
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Median");
+
+    chart2.nat3 = chart2.svg.append("text")
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Earnings");
+
+    chart2.yLabel = chart2.svg.append('text')
+      .attr("x", -1*chart2.margin.left)
+      .attr("y", -1*chart2.margin.top)
       .attr("dy", ".71em")
       .style("text-anchor", "start")
       .text("Median Weekly Earnings");
 
-    chart2.gy.append('text')
-      .attr("x", -chart2.margin.left)
-      .attr("y", -chart2.margin.top)
+    chart2.line = chart2.svg.append('line')
+      .attr('stroke-width',2)
+      .attr('stroke','black'); 
+
+  } else {
+
+    chart2.yLabel = chart2.svg.append('text')
+      .attr("x", -1*chart2.margin.left)
+      .attr("y", -1*chart2.margin.top)
       .attr("dy", ".71em")
       .style("text-anchor", "start")
       .text("Weekly Earnings");
@@ -540,6 +582,8 @@ function Chart2(selector) {
     chart2.line = chart2.svg.append('line')
       .attr('stroke-width',2)
       .attr('stroke','black'); 
+
+  }    
 
   chart2.resize();
 }
@@ -561,13 +605,32 @@ Chart2.prototype = {
 
     chart2.y.range([chart2.height, 0]);
 
-    chart2.gy.call(chart2.yAxis);
+    if(screen.width < 992) {
+      chart2.gy.call(chart2.yAxis);
 
-    chart2.line
-      .attr('x1',0)
-      .attr('y1',chart2.y(803))
-      .attr('x2',chart2.width)
-      .attr('y2',chart2.y(803));
+      chart2.line
+        .attr('x1',0)
+        .attr('y1',chart2.y(803))
+        .attr('x2',chart2.width)
+        .attr('y2',chart2.y(803));
+
+      chart2.nat1
+        .attr("x", chart2.width)
+        .attr("y", chart2.y(980));
+      chart2.nat2
+        .attr("x", chart2.width)
+        .attr("y", chart2.y(880));
+      chart2.nat3
+        .attr("x", chart2.width)
+        .attr("y", chart2.y(780));
+
+    } else {
+      chart2.line
+        .attr('x1',-1*chart2.margin.right)
+        .attr('y1',chart2.y(803))
+        .attr('x2',chart2.width)
+        .attr('y2',chart2.y(803));
+    }
 
     chart2.update()
   },

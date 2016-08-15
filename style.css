@@ -54,3 +54,8 @@ div.tooltip {
   font-weight: 700;
   line-height: 1;
 }
+
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
