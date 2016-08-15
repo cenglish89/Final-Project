@@ -719,6 +719,16 @@ Chart2.prototype = {
       .attr('r', 0)
       .remove();
 
+    //data labels
+    var bubbles = chart2.svg.append("g")
+      .data(txData2);
+
+    bubbles.append("text")
+      .text(function (d) {return d.socname;})
+      .attr("x",function (d) {return chart2.x(d.rank)})
+      .attr("y",function (d) {return chart2.y(d.earn)});
+
+
     //nest data for the lines
     chart2.counts = d3.nest()
       .key(function(d) {return d.socname})
@@ -754,6 +764,7 @@ Chart2.prototype = {
       .attr('y1',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .attr('y2',function (d) {return (chart2.y(d.values[0].earn)+chart2.y(d.values[1].earn))/2})
       .remove();
+
 
   }
 }
