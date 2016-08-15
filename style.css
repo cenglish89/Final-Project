@@ -37,6 +37,11 @@
   opacity: .8;
 }
 
+.cover {
+  stroke-width: 1;
+  opacity: .8;
+}
+
 .point.filtered {
   opacity: .05;
 }

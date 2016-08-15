@@ -342,7 +342,9 @@ Chart.prototype = {
     var chart = this;
 
     // TRANSFORM DATA
+
     txData = app.data1.slice();
+    txData4 = txData.filter(function (d) { return d.level === "agg"; });
 
     if (app.options.filtered) {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
@@ -350,6 +352,7 @@ Chart.prototype = {
 
     //remove previous chart so can see grey colors
     d3.select("#chart1").selectAll(".point").remove();
+    d3.select("#chart1").selectAll(".cover").remove();
 
     //filter works using highlight
 //    if (app.options.highlight!== false) {
@@ -372,10 +375,29 @@ Chart.prototype = {
        d3.selectAll('#detail-filter.filter').classed('invisible', false);
     }
 
+
+     if (app.options.filtered === 'detail' & app.options.highlight===false) {
+      var cover = chart.svg.selectAll(".cover")
+      .data(txData4);
+
+      cover.enter().append("circle")
+        .attr("class", "cover")
+        .style("stroke",  function (d) {return chart.color([d.wagegap_group]); })
+        .style("fill", function (d) {return chart.color([d.wagegap_group]); })
+        .attr("r", function (d) { return chart.r(d.total); })
+        .attr("cx", function (d) { return chart.x(d.femper); })
+        .attr("cy", function (d) { return chart.y(d.earn); });
+
+      d3.selectAll(".cover")
+        .transition().duration(1500)
+        .attr("r", 0);
+
+    }
     
+
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
-    // UPDATE CHART ELEMENTS
+    // UPDATE CHART ELEMENTS  
 
       //return d.country is a key, look for circle with that label year after year
       //data function takes data then the key
@@ -718,16 +740,6 @@ Chart2.prototype = {
       .transition().duration(TRANSITION_DURATION)
       .attr('r', 0)
       .remove();
-
-    //data labels
-    var bubbles = chart2.svg.append("g")
-      .data(txData2);
-
-    bubbles.append("text")
-      .text(function (d) {return d.socname;})
-      .attr("x",function (d) {return chart2.x(d.rank)})
-      .attr("y",function (d) {return chart2.y(d.earn)});
-
 
     //nest data for the lines
     chart2.counts = d3.nest()
