@@ -672,6 +672,7 @@ Chart2.prototype = {
     d3.select("#chart2").selectAll(".point").remove();
     d3.select("#chart2").selectAll(".line").remove();
     d3.select("#chart2").selectAll(".labels").remove();
+    d3.select("#chart2").selectAll(".titles").remove();
 
 
     if (app.options.filtered) {
@@ -687,8 +688,22 @@ Chart2.prototype = {
                   .scale(chart2.x);
 
 
-      //labels for the detailed view
+      //labels and Titles for the detailed view
     if (app.options.filtered==="detail") {
+      chart2.title = chart2.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "start")
+        .attr("x", chart2.width/4)
+        .attr("y", 0)
+        .text("Average of Top 15 Occupations in Each Category");
+
+      chart2.title2 = chart2.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "start")
+        .attr("x", chart2.width/4)
+        .attr("y", chart2.margin.top)
+        .text("Male versus Female Earnings");      
+
       chart2.high1 = chart2.svg.append('text')
         .attr("class", "labels")
         .style("text-anchor", "middle")
@@ -759,7 +774,7 @@ Chart2.prototype = {
         .attr("class", "labels")
         .style("text-anchor", "middle")
         .attr("x", chart2.x(4))
-        .attr("y", chart2.y(1200))
+        .attr("y", chart2.y(1175))
         .text("Highest %")
         .attr("opacity",0)
         .transition()
@@ -770,7 +785,7 @@ Chart2.prototype = {
         .style("text-anchor", "middle")
         .attr("class", "labels")
         .attr("x", chart2.x(4))
-        .attr("y", chart2.y(1100))
+        .attr("y", chart2.y(1075))
         .text("of Men")
         .attr("opacity",0)
         .transition()
@@ -825,7 +840,7 @@ Chart2.prototype = {
         .attr("class", "labels")
         .style("text-anchor", "middle")
         .attr("x", chart2.x(7))
-        .attr("y", chart2.y(950))
+        .attr("y", chart2.y(450))
         .text("Highest")
         .attr("opacity",0)
         .transition()
@@ -836,7 +851,7 @@ Chart2.prototype = {
         .style("text-anchor", "middle")
         .attr("class", "labels")
         .attr("x", chart2.x(7))
-        .attr("y", chart2.y(850))
+        .attr("y", chart2.y(350))
         .text("% Women")
         .attr("opacity",0)
         .transition()
@@ -864,7 +879,21 @@ Chart2.prototype = {
         .transition()
         .duration(1000)
         .attr("opacity",1);
-    } 
+    } else {
+      chart2.title = chart2.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.width/2)
+        .attr("y", 0)
+        .text("Occupational Group Earnings");
+
+      chart2.title2 = chart2.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.width/2)
+        .attr("y", chart2.margin.top)
+        .text("Male versus Female Earnings");
+    }
 
 
 
