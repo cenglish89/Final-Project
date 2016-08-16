@@ -295,6 +295,10 @@ function Chart(selector) {
   }
 
   //Legends
+   legendname = 400;
+   legendlabel = 425;
+   legendobj = 440;
+
   //Color legend
     var legendcolors = [ 
         { gap: 5, gap_text: "<70%", color: "#bd0026" },
@@ -304,14 +308,11 @@ function Chart(selector) {
         { gap: 1, gap_text: ">100%", color: "#016c59" }        
       ]
 
-   legendtext = 440;
-   legendobj = 450;
-
   chart.legend = chart.svg.selectAll('rect')
       .data(legendcolors)
       .enter()
       .append("rect")
-      .attr("x", function(d, i){ return i *  55;})
+      .attr("x", function(d, i){ return ((i *  45)-chart.margin.left);})
       .attr("y", legendobj)
       .attr("width", 30)
       .attr("height", 30)
@@ -324,12 +325,60 @@ function Chart(selector) {
       .data(legendcolors).enter()
       .append("text")
       .attr("class", "legendlabel")
-      .attr("x", function(d, i){ return ((i *  55) - 10);})
-      .attr("y", legendtext)
+      .attr("x", function(d, i){ return ((i *  45)-chart.margin.left);})
+      .attr("y", legendlabel)
       .text(function(d) {
            return d.gap_text;
         })
       .style("fill", "#000");
+
+  chart.colorlegend = chart.svg.append("text")
+      .attr("class", "legendtext")
+      .attr("x",-1*chart.margin.left)
+      .attr("y", legendname)
+      .attr("dy", ".71em")
+      .style("text-anchor", "start")
+      .text("Women's Earnings as % of Men's"); 
+
+  //Size legend
+  var legendsize = [
+    {total: 300, text: "300K"},
+    {total: 600, text: "600K"},
+    {total: 1200, text: "1,200K"},
+    {total: 2500, text: "2,500K"},
+    {total: 5000, text: "5,000K"},
+    {total: 10000, text: "10,000K"},
+  ]
+
+  chart.legendcirc = chart.svg.selectAll('circ')
+      .data(legendsize)
+      .enter()
+      .append("circle")
+      .attr("class", "circ")
+      .attr("r", function (d) { return chart.r(d.total); })
+      .attr("cx", function(d, i){ return ((45*5) + 40 + (i *  45)-chart.margin.left);})
+      .attr("cy", legendobj+15)
+      .style("fill", '#949494')
+      .style("opacity", 1);
+
+  chart.svg.selectAll('legendlabel')
+      .data(legendsize).enter()
+      .append("text")
+      .attr("class", "legendlabel")
+      .attr("x", function(d, i){ return ((45*5) + 20 + (i *  45)-chart.margin.left);})
+      .attr("y", legendlabel)
+      .text(function(d) {
+           return d.text;
+        })
+      .style("fill", "#000");
+
+  chart.sizelegend = chart.svg.append("text")
+      .attr("class", "legendtext")
+      .attr("x",(45*5) + 40-chart.margin.left)
+      .attr("y", legendname)
+      .attr("dy", ".71em")
+      .style("text-anchor", "start")
+      .text("Scaled by Number of Workers"); 
 
 
   chart.resize();
@@ -369,7 +418,6 @@ Chart.prototype = {
       chart.nat3
         .attr("y", chart.y(770));
      
-
       chart.line
         .attr('y1',chart.y(803))
         .attr('x2',chart.width)
