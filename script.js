@@ -376,6 +376,7 @@ Chart.prototype = {
     }
 
 
+    //idea for cover circle from here http://bl.ocks.org/nbremer/8df57868090f11e59175804e2062b2aa
      if (app.options.filtered === 'detail' & app.options.highlight===false) {
       var cover = chart.svg.selectAll(".cover")
       .data(txData4);
@@ -409,7 +410,7 @@ Chart.prototype = {
 
       //Tooltip code from talking to Vivian
     points.enter().append('circle')
-      .attr('class','point')
+      .attr('class','point path2')
       .sort(function (a, b) { return b.total - a.total; })
       .style('stroke',  function (d) {
         if (app.options.filtered==="agg") {
@@ -528,7 +529,7 @@ function Chart2(selector) {
     };
   } else {
     chart2.margin = { 
-      top: 20, right: 15, bottom: 130, left: 0
+      top: 20, right: 25, bottom: 130, left: 0
     };
   }
 
@@ -563,7 +564,7 @@ function Chart2(selector) {
     chart2.gy = chart2.svg.append('g')
       .attr('class', 'y axis');
 
-
+  //if on a small or medium device, add a yAxis to the right hand chart
   if(screen.width < 992) {
 
     chart2.nat1 = chart2.svg.append("text")
@@ -670,6 +671,8 @@ Chart2.prototype = {
     //remove previous chart so can see grey colors
     d3.select("#chart2").selectAll(".point").remove();
     d3.select("#chart2").selectAll(".line").remove();
+    d3.select("#chart2").selectAll(".labels").remove();
+
 
     if (app.options.filtered) {
         txData2 = txData2.filter(function (d) { return d.level === app.options.filtered; });
@@ -682,6 +685,188 @@ Chart2.prototype = {
 
     var xAxis = d3.axisBottom()
                   .scale(chart2.x);
+
+
+      //labels for the detailed view
+    if (app.options.filtered==="detail") {
+      chart2.high1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(1))
+        .attr("y", chart2.y(2050))
+        .text("Highest")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.high2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(1))
+        .attr("y", chart2.y(1950))
+        .text("Earning")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.large1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(2))
+        .attr("y", chart2.y(1500))
+        .text("Largest")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.large2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(2))
+        .attr("y", chart2.y(1400))
+        .text("Wage Gap")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.men1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(3))
+        .attr("y", chart2.y(1300))
+        .text("Employ The")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.men2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(3))
+        .attr("y", chart2.y(1200))
+        .text("Most Men")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.menp1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(4))
+        .attr("y", chart2.y(1200))
+        .text("Highest %")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.menp2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(4))
+        .attr("y", chart2.y(1100))
+        .text("of Men")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.small1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(5))
+        .attr("y", chart2.y(550))
+        .text("Smallest")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.small2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(5))
+        .attr("y", chart2.y(450))
+        .text("Wage Gap")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.women1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(6))
+        .attr("y", chart2.y(1050))
+        .text("Employ The")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.women2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(6))
+        .attr("y", chart2.y(950))
+        .text("Most Women")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.womenp1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(7))
+        .attr("y", chart2.y(950))
+        .text("Highest")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.womenp2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(7))
+        .attr("y", chart2.y(850))
+        .text("% Women")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.lowest1 = chart2.svg.append('text')
+        .attr("class", "labels")
+        .style("text-anchor", "middle")
+        .attr("x", chart2.x(8))
+        .attr("y", chart2.y(250))
+        .text("Lowest")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+
+      chart2.lowest2 = chart2.svg.append('text')
+        .style("text-anchor", "middle")
+        .attr("class", "labels")
+        .attr("x", chart2.x(8))
+        .attr("y", chart2.y(150))
+        .text("Earning")
+        .attr("opacity",0)
+        .transition()
+        .duration(1000)
+        .attr("opacity",1);
+    } 
+
+
 
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
@@ -697,7 +882,7 @@ Chart2.prototype = {
       .on("mouseover", function(d) {
         chart2.tooltip.transition()
           .duration(200)
-          .style("opacity", .9)   
+          .style("opacity", .9) 
         chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn))
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
@@ -740,6 +925,7 @@ Chart2.prototype = {
       .transition().duration(TRANSITION_DURATION)
       .attr('r', 0)
       .remove();
+
 
     //nest data for the lines
     chart2.counts = d3.nest()
