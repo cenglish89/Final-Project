@@ -32,6 +32,18 @@
   font-weight: 700;
 }
 
+.titles {
+  font-weight: 700;
+  font-size: 16px;
+  fill: #216C2A;
+}
+
+.titles2 {
+  font-weight: 700;
+  font-size: 14px;
+  fill: #216C2A;
+}
+
 .point {
   stroke-width: 1;
   opacity: .8;

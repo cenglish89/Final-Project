@@ -275,6 +275,26 @@ function Chart(selector) {
       .attr('stroke-width',2)
       .attr('stroke','black');  
 
+        //labels and Titles for the detailed view
+    if (app.options.filtered==="detail") {
+      chart.title = chart.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("y", 0)
+        .text("Earnings for Individual Occupations");
+
+    } else {
+      chart.title = chart.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("y", 0)
+        .text("Aggregated Occupational Group Earnings");
+
+    }
+
+
+
+
   if(screen.width < 992) {
 
     chart.med = chart.svg.append("text")
@@ -330,6 +350,9 @@ Chart.prototype = {
       chart.nat3
         .attr("y", chart.y(770));
     
+      chart.title
+        .attr("x", chart.width/2);
+
       chart.line
         .attr('y1',chart.y(803))
         .attr('x2',chart.width)
@@ -525,11 +548,11 @@ function Chart2(selector) {
   // SVG and MARGINS
   if(screen.width < 992) {
     chart2.margin = { 
-      top: 20, right: 15, bottom: 130, left: 45
+      top: 20, right: 25, bottom: 130, left: 45
     };
   } else {
     chart2.margin = { 
-      top: 20, right: 25, bottom: 130, left: 0
+      top: 20, right: 35, bottom: 130, left: 0
     };
   }
 
@@ -695,14 +718,14 @@ Chart2.prototype = {
         .style("text-anchor", "start")
         .attr("x", chart2.width/4)
         .attr("y", 0)
-        .text("Average of Top 15 Occupations in Each Category");
+        .text("Average Earnings of Top 15 Occupations in Each Category");
 
       chart2.title2 = chart2.svg.append('text')
-        .attr("class", "titles")
+        .attr("class", "titles2")
         .style("text-anchor", "start")
         .attr("x", chart2.width/4)
         .attr("y", chart2.margin.top)
-        .text("Male versus Female Earnings");      
+        .text("Male versus Female Earnings, Ordered by Female Earnings");      
 
       chart2.high1 = chart2.svg.append('text')
         .attr("class", "labels")
@@ -882,17 +905,17 @@ Chart2.prototype = {
     } else {
       chart2.title = chart2.svg.append('text')
         .attr("class", "titles")
-        .style("text-anchor", "middle")
-        .attr("x", chart2.width/2)
+        .style("text-anchor", "start")
+        .attr("x", chart2.width/4)
         .attr("y", 0)
-        .text("Occupational Group Earnings");
+        .text("Occupational Group Earnings by Gender");
 
       chart2.title2 = chart2.svg.append('text')
-        .attr("class", "titles")
-        .style("text-anchor", "middle")
-        .attr("x", chart2.width/2)
+        .attr("class", "titles2")
+        .style("text-anchor", "start")
+        .attr("x", chart2.width/4)
         .attr("y", chart2.margin.top)
-        .text("Male versus Female Earnings");
+        .text("Ordered by Female Earnings");
     }
 
 
