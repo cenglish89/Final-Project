@@ -44,6 +44,10 @@
   fill: #216C2A;
 }
 
+.legendlabel {
+  font-size: 12px;
+}
+
 .point {
   stroke-width: 1;
   opacity: .8;

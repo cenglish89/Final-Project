@@ -275,25 +275,6 @@ function Chart(selector) {
       .attr('stroke-width',2)
       .attr('stroke','black');  
 
-        //labels and Titles for the detailed view
-    if (app.options.filtered==="detail") {
-      chart.title = chart.svg.append('text')
-        .attr("class", "titles")
-        .style("text-anchor", "middle")
-        .attr("y", 0)
-        .text("Earnings for Individual Occupations");
-
-    } else {
-      chart.title = chart.svg.append('text')
-        .attr("class", "titles")
-        .style("text-anchor", "middle")
-        .attr("y", 0)
-        .text("Aggregated Occupational Group Earnings");
-
-    }
-
-
-
 
   if(screen.width < 992) {
 
@@ -312,6 +293,44 @@ function Chart(selector) {
       .text("Median");
 
   }
+
+  //Legends
+  //Color legend
+    var legendcolors = [ 
+        { gap: 5, gap_text: "<70%", color: "#bd0026" },
+        { gap: 4, gap_text: "70-80%", color: "#f03b20" },
+        { gap: 3, gap_text: "80-90%", color: "#fd8d3c" },
+        { gap: 2, gap_text: "90-100%", color: "#fed976" },
+        { gap: 1, gap_text: ">100%", color: "#016c59" }        
+      ]
+
+   legendtext = 440;
+   legendobj = 450;
+
+  chart.legend = chart.svg.selectAll('rect')
+      .data(legendcolors)
+      .enter()
+      .append("rect")
+      .attr("x", function(d, i){ return i *  55;})
+      .attr("y", legendobj)
+      .attr("width", 30)
+      .attr("height", 30)
+      .style("fill", function(d) { 
+        return d.color;
+      })
+      .style("opacity", 0.8);
+
+  chart.svg.selectAll('legendlabel')
+      .data(legendcolors).enter()
+      .append("text")
+      .attr("class", "legendlabel")
+      .attr("x", function(d, i){ return ((i *  55) - 10);})
+      .attr("y", legendtext)
+      .text(function(d) {
+           return d.gap_text;
+        })
+      .style("fill", "#000");
+
 
   chart.resize();
 }
@@ -349,9 +368,7 @@ Chart.prototype = {
         .attr("y", chart.y(870));
       chart.nat3
         .attr("y", chart.y(770));
-    
-      chart.title
-        .attr("x", chart.width/2);
+     
 
       chart.line
         .attr('y1',chart.y(803))
@@ -369,6 +386,7 @@ Chart.prototype = {
     txData = app.data1.slice();
     txData4 = txData.filter(function (d) { return d.level === "agg"; });
 
+
     if (app.options.filtered) {
         txData = txData.filter(function (d) { return d.level === app.options.filtered; });
     } 
@@ -376,6 +394,7 @@ Chart.prototype = {
     //remove previous chart so can see grey colors
     d3.select("#chart1").selectAll(".point").remove();
     d3.select("#chart1").selectAll(".cover").remove();
+    d3.select("#chart1").selectAll(".titles").remove();
 
     //filter works using highlight
 //    if (app.options.highlight!== false) {
@@ -396,6 +415,27 @@ Chart.prototype = {
     } else {
        d3.selectAll('#soc-group').classed('invisible', false);
        d3.selectAll('#detail-filter.filter').classed('invisible', false);
+    }
+
+        //labels and Titles for the detailed view
+    if (app.options.filtered === 'detail') {
+
+      chart.title = chart.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("x", chart.width/2)
+        .attr("y", 0)
+        .text("Earnings for Individual Occupations");
+
+    } else {
+
+      chart.title = chart.svg.append('text')
+        .attr("class", "titles")
+        .style("text-anchor", "middle")
+        .attr("x", chart.width/2)
+        .attr("y", 0)
+        .text("Aggregated Occupational Group Earnings");
+
     }
 
 
@@ -696,6 +736,7 @@ Chart2.prototype = {
     d3.select("#chart2").selectAll(".line").remove();
     d3.select("#chart2").selectAll(".labels").remove();
     d3.select("#chart2").selectAll(".titles").remove();
+    d3.select("#chart2").selectAll(".titles2").remove();
 
 
     if (app.options.filtered) {
