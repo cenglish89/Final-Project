@@ -510,6 +510,8 @@ Chart.prototype = {
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
     // UPDATE CHART ELEMENTS  
+    var formatAsPercentage = d3.format(".0%");
+
 
       //return d.country is a key, look for circle with that label year after year
       //data function takes data then the key
@@ -585,7 +587,7 @@ Chart.prototype = {
               return select_group.indexOf(d.group) ==-1 ? 0.2 : 1;
             })
             ;
-        chart.tooltip.html(d.socname)
+        chart.tooltip.html(d.socname + "<br>" + "Wage Gap: " + formatAsPercentage(d.wagegap))
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
             })          
@@ -1013,6 +1015,7 @@ Chart2.prototype = {
 
     // UPDATE CHART ELEMENTS
     var formatAsDollars = d3.format("$.0f")
+    var formatAsPercentage = d3.format(".0%");
 
     //data function takes data then the key
     var points=chart2.svg.selectAll('.point')
@@ -1024,7 +1027,7 @@ Chart2.prototype = {
         chart2.tooltip.transition()
           .duration(200)
           .style("opacity", .9) 
-        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn))
+        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Wage Gap: " + formatAsPercentage(d.wagegap))
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
             })          
