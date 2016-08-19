@@ -6,7 +6,15 @@
   background: #216C2A;
   color: white;
   padding: 1em 0 2em;
+  font-family: Lato, sans-serif !important;
 }
+
+.body {
+    font-family: Lato, sans-serif !important;
+    background-color:#DEEFF5;
+    color: #F0F0F0 ;
+  }
+
 
 #chart svg {
   display: block;
@@ -30,22 +38,31 @@
 
 .label {
   font-weight: 700;
+  font-family: Lato, sans-serif !important;
 }
 
 .titles {
   font-weight: 700;
   font-size: 16px;
   fill: #216C2A;
+  font-family: Lato, sans-serif !important;
 }
 
 .titles2 {
   font-weight: 700;
   font-size: 14px;
   fill: #216C2A;
+  font-family: Lato, sans-serif !important;
 }
 
 .legendlabel {
   font-size: 11px;
+  font-family: Lato, sans-serif !important;
+}
+
+.legendtext {
+  font-size: 12px;
+  font-family: Lato, sans-serif !important;
 }
 
 .point {

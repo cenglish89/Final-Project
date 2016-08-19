@@ -45,19 +45,21 @@ app = {
 
       d3.select('#filter-agg').on('click', function () {
         if (app.options.filtered === 'agg') {
-          app.options.filtered = false;
-          d3.select('#filter-agg').classed('active', false);  
+          app.options.filtered = 'detail';
+          d3.selectAll('.filter').classed('active', true);
+          d3.select('#filter-agg').classed('active', false); 
         } else {
           app.options.filtered = 'agg';
           d3.selectAll('.filter').classed('active', false);
-          d3.select('#filter-agg').classed('active', true);
+          d3.select('#filter-agg').classed('active', true); 
         }
         app.components.forEach(function (d) {d.update(); });
       });
 
       d3.select('#filter-detail').on('click', function () {
         if ( app.options.filtered === 'detail') {
-           app.options.filtered = false;
+           app.options.filtered = 'agg';
+           d3.selectAll('.filter').classed('active', true);
           d3.select('#filter-detail').classed('active', false);
         } else {
            app.options.filtered = 'detail';
@@ -1015,7 +1017,7 @@ Chart2.prototype = {
 
     // UPDATE CHART ELEMENTS
     var formatAsDollars = d3.format("$.0f")
-    var formatAsPercentage = d3.format(".0%");
+    var formatAsPercentage = d3.format(".2");
 
     //data function takes data then the key
     var points=chart2.svg.selectAll('.point')
@@ -1023,11 +1025,12 @@ Chart2.prototype = {
 
     points.enter().append('circle')
       .attr('class','point path')
+      .sort(function (a, b) { return a.rank - b.rank; })
       .on("mouseover", function(d) {
         chart2.tooltip.transition()
           .duration(200)
           .style("opacity", .9) 
-        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Wage Gap: " + formatAsPercentage(d.wagegap))
+        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for Men's 1$")
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
             })          
