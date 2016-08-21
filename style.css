@@ -67,12 +67,12 @@
 
 .point {
   stroke-width: 1;
-  opacity: .8;
+  opacity: .9;
 }
 
 .cover {
   stroke-width: 1;
-  opacity: .8;
+  opacity: 1;
 }
 
 .point.filtered {

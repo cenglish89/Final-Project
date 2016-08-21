@@ -383,46 +383,6 @@ Chart.prototype = {
     }
 
 
-    //idea for cover circle from here http://bl.ocks.org/nbremer/8df57868090f11e59175804e2062b2aa
-     if (app.options.filtered === 'detail') {
-      var cover = chart.svg.selectAll(".cover")
-      .data(txData4);
-
-      cover.enter().append("circle")
-        .attr("class", "cover")
-        .style("stroke",  function (d) {return chart.color([d.wagegap_group]); })
-        .style("fill", function (d) {return chart.color([d.wagegap_group]); })
-        .attr("r", function (d) { return chart.r(d.total); })
-        .attr("cx", function (d) { return chart.x(d.femper); })
-        .attr("cy", function (d) { return chart.y(d.earn); });
-
-      d3.selectAll(".cover")
-        .transition().duration(1500)
-        .attr("r", 0);
-
-    } else {
-      var cover = chart.svg.selectAll(".cover")
-        .data(txData4);
-
-      cover.enter().append("circle")
-        .attr("class", "cover")
-        .style("stroke",  function (d) {return chart.color([d.wagegap_group]); })
-        .style("fill", function (d) {return chart.color([d.wagegap_group]); })
-        .attr("r", 0)
-        .attr("cx", function (d) { return chart.x(d.femper); })
-        .attr("cy", function (d) { return chart.y(d.earn); });
-
-      d3.selectAll(".cover")
-        .transition().duration(1500)
-        .attr("r", function (d) { return chart.r(d.total); });
-
-      d3.selectAll(".cover")
-        .transition().duration(0)
-        .attr("r", 0);
-
-    }
-    
-
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
     // UPDATE CHART ELEMENTS  
@@ -521,6 +481,26 @@ Chart.prototype = {
       .attr('cy', function (d) {return chart.y(d.earn_group);})
       .attr('r', 0)
       .remove();
+
+        //idea for cover circle from here http://bl.ocks.org/nbremer/8df57868090f11e59175804e2062b2aa
+     if (app.options.filtered === 'detail') {
+      var cover = chart.svg.selectAll(".cover")
+      .data(txData4);
+
+      cover.enter().append("circle")
+        .attr("class", "cover")
+        .style("stroke",  function (d) {return chart.color([d.wagegap_group]); })
+        .style("fill", function (d) {return chart.color([d.wagegap_group]); })
+        .attr("r", function (d) { return chart.r(d.total); })
+        .attr("cx", function (d) { return chart.x(d.femper); })
+        .attr("cy", function (d) { return chart.y(d.earn); });
+
+      d3.selectAll(".cover")
+        .transition().duration(1500)
+        .attr("r", 0);
+
+    } else {
+    }
  
 
   }
