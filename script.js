@@ -427,7 +427,7 @@ Chart.prototype = {
 
     // UPDATE CHART ELEMENTS  
     var formatAsPercentage = d3.format(".2");
-
+    var formatAsDollars = d3.format("$.0f")
 
       //return d.country is a key, look for circle with that label year after year
       //data function takes data then the key
@@ -477,9 +477,15 @@ Chart.prototype = {
               return select_group.indexOf(d.group) ==-1 ? 0.2 : 1;
             })
             ;
-        chart.tooltip.html(d.socname + "<br>" + "Wage Gap: " + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
-          .style("left", (d3.event.pageX) + "px")   
-          .style("top", (d3.event.pageY - 28) + "px");  
+          if (d.wagegap < 1) {
+            return chart.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
+              .style("left", (d3.event.pageX) + "px")   
+              .style("top", (d3.event.pageY - 28) + "px");  
+          } else {
+            return chart.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "$ for 1$ by Men")
+              .style("left", (d3.event.pageX) + "px")   
+              .style("top", (d3.event.pageY - 28) + "px");  
+                }
             })          
         .on("mouseout", function(d) {   
             chart.tooltip.transition()    
@@ -928,10 +934,10 @@ Chart2.prototype = {
               return d.group.indexOf(select_group) ===-1 ? 0.2 : 1;
             })
             ;
-        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
-          .style("left", (d3.event.pageX) + "px")   
-          .style("top", (d3.event.pageY - 28) + "px");  
-            })          
+         chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
+            .style("left", (d3.event.pageX) + "px")   
+            .style("top", (d3.event.pageY - 28) + "px");  
+        })          
         .on("mouseout", function(d) {   
             chart2.tooltip.transition()    
                 .duration(500)    
