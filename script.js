@@ -74,103 +74,6 @@ app = {
       app.components.forEach(function (d) {d.update(); }); 
     });
 
-    d3.select('#highlight-wTotal').on('click', function () {
-        if (app.options.highlight === 'wTotal') {
-          app.options.highlight = false;
-          d3.select('#highlight-wTotal').classed('active', false);
-        } else {
-          app.options.highlight = 'wTotal';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-wTotal').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-mTotal').on('click', function () {
-        if (app.options.highlight === 'mTotal') {
-          app.options.highlight = false;
-          d3.select('#highlight-mTotal').classed('active', false);
-        } else {
-          app.options.highlight = 'mTotal';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-mTotal').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-wPercent').on('click', function () {
-        if (app.options.highlight === 'wPercent') {
-          app.options.highlight = false;
-          d3.select('#highlight-wPercent').classed('active', false);
-        } else {
-          app.options.highlight = 'wPercent';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-wPercent').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-mPercent').on('click', function () {
-        if (app.options.highlight === 'mPercent') {
-          app.options.highlight = false;
-          d3.select('#highlight-mPercent').classed('active', false);
-        } else {
-          app.options.highlight = 'mPercent';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-mPercent').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-highEarn').on('click', function () {
-        if (app.options.highlight === 'highEarn') {
-          app.options.highlight = false;
-          d3.select('#highlight-highEarn').classed('active', false);
-        } else {
-          app.options.highlight = 'highEarn';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-highEarn').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-lowEarn').on('click', function () {
-        if (app.options.highlight === 'lowEarn') {
-          app.options.highlight = false;
-          d3.select('#highlight-lowEarn').classed('active', false);
-        } else {
-          app.options.highlight = 'lowEarn';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-lowEarn').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-bigGap').on('click', function () {
-        if (app.options.highlight === 'bigGap') {
-          app.options.highlight = false;
-          d3.select('#highlight-bigGap').classed('active', false);
-        } else {
-          app.options.highlight = 'bigGap';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-bigGap').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-    d3.select('#highlight-smallGap').on('click', function () {
-        if (app.options.highlight === 'smallGap') {
-          app.options.highlight = false;
-          d3.select('#highlight-smallGap').classed('active', false);
-        } else {
-          app.options.highlight = 'smallGap';
-          d3.selectAll('.highlight').classed('active', false);
-          d3.select('#highlight-smallGap').classed('active', true);
-        }
-        app.components.forEach(function (d) {d.update(); });
-      });
-
-
     // app.resize() will be called anytime the page size is changed
     d3.select('window').on('resize', app.resize);
 
@@ -458,14 +361,6 @@ Chart.prototype = {
       });
     }
 
-    //Hide the options for detailed looks until ready for it
-    if (app.options.filtered === 'agg') {
-      d3.selectAll('#soc-group').classed('invisible', true);  
-      d3.selectAll('#detail-filter.filter').classed('invisible', true);
-    } else {
-       d3.selectAll('#soc-group').classed('invisible', false);
-       d3.selectAll('#detail-filter.filter').classed('invisible', false);
-    }
 
         //labels and Titles for the detailed view
     if (app.options.filtered === 'detail') {
@@ -490,7 +385,7 @@ Chart.prototype = {
 
 
     //idea for cover circle from here http://bl.ocks.org/nbremer/8df57868090f11e59175804e2062b2aa
-     if (app.options.filtered === 'detail' & app.options.highlight===false) {
+     if (app.options.filtered === 'detail') {
       var cover = chart.svg.selectAll(".cover")
       .data(txData4);
 
@@ -506,13 +401,33 @@ Chart.prototype = {
         .transition().duration(1500)
         .attr("r", 0);
 
+    } else {
+      var cover = chart.svg.selectAll(".cover")
+        .data(txData4);
+
+      cover.enter().append("circle")
+        .attr("class", "cover")
+        .style("stroke",  function (d) {return chart.color([d.wagegap_group]); })
+        .style("fill", function (d) {return chart.color([d.wagegap_group]); })
+        .attr("r", 0)
+        .attr("cx", function (d) { return chart.x(d.femper); })
+        .attr("cy", function (d) { return chart.y(d.earn); });
+
+      d3.selectAll(".cover")
+        .transition().duration(1500)
+        .attr("r", function (d) { return chart.r(d.total); });
+
+      d3.selectAll(".cover")
+        .transition().duration(0)
+        .attr("r", 0);
+
     }
     
 
     //brush https://bl.ocks.org/mbostock/4063663 note the version without brushing
 
     // UPDATE CHART ELEMENTS  
-    var formatAsPercentage = d3.format(".0%");
+    var formatAsPercentage = d3.format(".2");
 
 
       //return d.country is a key, look for circle with that label year after year
@@ -527,28 +442,8 @@ Chart.prototype = {
     points.enter().append('circle')
       .attr('class','point path2')
       .sort(function (a, b) { return b.total - a.total; })
-      .style('stroke',  function (d) {
-        if (app.options.filtered==="agg") {
-          return chart.color([d.wagegap_group]);
-        } else if (app.options.highlight===false) {
-          return chart.color([d.wagegap_group]);
-        } else if (d.highlight.indexOf(app.options.highlight)===-1) {
-                return '#999999';
-              } else {
-                return chart.color([d.wagegap_group]);
-              }
-             })
-      .style('fill', function (d) { 
-        if (app.options.filtered==="agg") {
-          return chart.color([d.wagegap_group]);
-        } else if (app.options.highlight===false) {
-          return chart.color([d.wagegap_group]);
-        } else if (d.highlight.indexOf(app.options.highlight)===-1) {
-                return '#999999';
-              } else {
-                return chart.color([d.wagegap_group]);
-              }
-             })
+      .style('stroke',  function (d) {return chart.color([d.wagegap_group])})
+      .style('fill', function (d) {return chart.color([d.wagegap_group])})
       .attr('r', function (d) {
         if (app.options.filtered==="agg") {
           return 0;
@@ -561,20 +456,16 @@ Chart.prototype = {
       .attr('cx',  function (d) {
         if (app.options.filtered==="agg") {
           return chart.x(d.femper);
-        } else if (app.options.highlight===false) {
-          return chart.x(d.femper_group);
         } else {
-          return chart.x(d.femper);
-        }
+          return chart.x(d.femper_group);
+        } 
       })
       .attr('cy',   function (d) {
         if (app.options.filtered==="agg") {
           return chart.y(d.earn);
-        } else if (app.options.highlight===false) {
-          return chart.y(d.earn_group);
         } else {
-          return chart.y(d.earn);
-        }
+          return chart.y(d.earn_group);
+        } 
       })
       .on("mouseover", function(d) {
         chart.tooltip.transition()
@@ -589,7 +480,7 @@ Chart.prototype = {
               return select_group.indexOf(d.group) ==-1 ? 0.2 : 1;
             })
             ;
-        chart.tooltip.html(d.socname + "<br>" + "Wage Gap: " + formatAsPercentage(d.wagegap))
+        chart.tooltip.html(d.socname + "<br>" + "Wage Gap: " + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
             })          
@@ -605,26 +496,27 @@ Chart.prototype = {
       .attr('r', function (d) { return chart.r(d.total); })
       .attr('cx',  function (d) {
         if (app.options.filtered==="agg") {
-          return chart.x(d.femper);
-        } else if (app.options.highlight===false) {
-          return chart.x(d.femper);
+          return chart.x(d.femper_group);
         } else {
           return chart.x(d.femper);
-        }
+        } 
       })
       .attr('cy', function (d) {
         if (app.options.filtered==="agg") {
-          return chart.y(d.earn);
-        } else if (app.options.highlight===false) {
-          return chart.y(d.earn);
+          return chart.y(d.earn_group);
         } else {
           return chart.y(d.earn);
-        }
+        } 
       });
       
       //for the circles that exit, do animation as remove
+      //doesn't seem to work with filter
+      //http://bl.ocks.org/alansmithy/e984477a741bc56db5a5
     points.exit()
-      .transition().duration(TRANSITION_DURATION)
+      .transition().duration(1500)
+      .attr('cx',  function (d) {return chart.x(d.femper_group);}) 
+      .attr('cy', function (d) {return chart.y(d.earn_group);})
+      .attr('r', 0)
       .remove();
  
 
@@ -811,7 +703,7 @@ Chart2.prototype = {
         .style("text-anchor", "start")
         .attr("x", chart2.width/4)
         .attr("y", 0)
-        .text("Average Earnings of Top 15 Occupations in Each Category");
+        .text("Average Earnings of Top 15 Occupations");
 
       chart2.title2 = chart2.svg.append('text')
         .attr("class", "titles2")
@@ -1030,7 +922,16 @@ Chart2.prototype = {
         chart2.tooltip.transition()
           .duration(200)
           .style("opacity", .9) 
-        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for Men's 1$")
+        var select_group = d.group
+        d3.selectAll(".path2")
+            .style("opacity", function(d) {
+              return d.group.indexOf(select_group) ===-1 ? 0.2 : 1;
+            })
+            .style("stroke", function(d) {
+              return d.group.indexOf(select_group) ===-1 ? 0.2 : 1;
+            })
+            ;
+        chart2.tooltip.html(d.socname + "<br>" + d.gender + " Earn " + formatAsDollars(d.earn) + "<br>" + "Women Earn " + formatAsPercentage(d.wagegap) + "&#162 for 1$ by Men")
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY - 28) + "px");  
             })          
@@ -1038,6 +939,8 @@ Chart2.prototype = {
             chart2.tooltip.transition()    
                 .duration(500)    
                 .style("opacity", 0)
+            d3.selectAll(".path2")
+              .style("opacity", 0.8)
           })
       .attr('r', function (d) {
         if (app.options.filtered==="agg") {
